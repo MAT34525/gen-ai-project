@@ -1,5 +1,14 @@
 # React + Vite
 
+## Setup (standalone)
+
+```sh
+sudo docker build -t genaif .
+sudo docker container run --name genaif -p 5173:5173 genaif
+```
+
+## Summary
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
