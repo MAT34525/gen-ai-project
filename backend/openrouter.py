@@ -2,7 +2,7 @@
 
 import httpx
 from typing import List, Dict, Any, Optional
-from .config import OPENROUTER_API_KEY, OPENROUTER_API_URL
+from config import OPENROUTER_API_KEY, OPENROUTER_API_URL
 
 
 async def query_model(
