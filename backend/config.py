@@ -24,3 +24,7 @@ OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # Data directory for conversation storage
 DATA_DIR = "data/conversations"
+
+# Ollama pour partie de matheo
+OLLAMA_URL = 'http://localhost:11434/api/generate'
+OLLAMA_MODEL = "qwen2.5:3b"
