@@ -2,12 +2,14 @@
 
 import httpx
 from typing import List, Dict, Any, Optional
-from config import OPENROUTER_API_KEY, OPENROUTER_API_URL
+
+from config import OPENROUTER_API_KEY, OPENROUTER_API_URL, OLLAMA_URL, OLLAMA_MODEL
+from models import CouncilModel
 
 #code matheo
 import asyncio
 
-async def query_model(model: str, messages: List[Dict[str, str]]) -> Optional[Dict[str, Any]]:
+async def query_model(model: CouncilModel, messages: List[Dict[str, str]]) -> Optional[Dict[str, Any]]:
     # code origine
     """
     headers = {
@@ -44,32 +46,48 @@ async def query_model(model: str, messages: List[Dict[str, str]]) -> Optional[Di
     
     #code matheo
     """Envoie une requête à l'instance Ollama locale."""
+
+    headers = {
+        "Content-Type": "application/json"
+    }
+
     payload = {
-        "model": model,
+        "model": model.model_name,
         "messages": messages,
         "stream": False  # On désactive le streaming pour récupérer la réponse complète
     }
 
     try:
         async with httpx.AsyncClient() as client:
+            
+            url: str = f"http://{model.ip}:{model.port}/api/chat"
+
             # Augmenter le timeout car les modèles locaux peuvent mettre du temps à répondre
             response = await client.post(
-                OLLAMA_URL, 
-                json=payload, 
+                url, 
+                json=payload,
+                headers=headers,
                 timeout=60.0 
             )
+
             response.raise_for_status()
-            return response.json()
+
+            data = response.json()
+
+            print("Data :")
+            print(data)
+
+            return {
+                'content': data['message']['content'],
+                'reasoning_details': None
+            }
     except Exception as e:
+        print(e)
         print(f"Erreur lors de la requête vers {model}: {e}")
         return None
 
-    
 
-    
-
-
-async def query_models_parallel(models: List[str], messages: List[Dict[str, str]]) -> Dict[str, Optional[Dict[str, Any]]]:
+async def query_models_parallel(models: List[CouncilModel], messages: List[Dict[str, str]]) -> Dict[str, Optional[Dict[str, Any]]]:
     #code origine
 
     # Create tasks for all models
@@ -78,5 +96,11 @@ async def query_models_parallel(models: List[str], messages: List[Dict[str, str]
     # Wait for all to complete
     responses = await asyncio.gather(*tasks)
 
+    print(models)
+    print(responses)
+
     # Map models to their responses
-    return {model: response for model, response in zip(models, responses)}
+    resp = {model.model_name: response for model, response in zip(models, responses)}
+
+    print(resp)
+    return resp
