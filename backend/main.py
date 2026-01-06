@@ -10,7 +10,10 @@ import json
 import asyncio
 
 import storage
-from council import run_full_council, generate_conversation_title, stage1_collect_responses, stage2_collect_rankings, stage3_synthesize_final, calculate_aggregate_rankings
+from council import Council
+from models import CouncilModel
+
+council = Council()
 
 app = FastAPI(title="LLM Council API")
 
@@ -49,12 +52,29 @@ class Conversation(BaseModel):
     title: str
     messages: List[Dict[str, Any]]
 
+class LLMModel(BaseModel):
+    """Required model data for registration."""
+    ip: str
+    port: int
+    model_name: str
+    model_role: int
+
 
 @app.get("/")
 async def root():
     """Health check endpoint."""
     return {"status": "ok", "service": "LLM Council API"}
 
+@app.post("/api/register")
+async def register_model(llm_model: LLMModel):
+    """Add a new model to the council."""
+
+    council.models.append(CouncilModel(
+        llm_model.ip,
+        llm_model.port,
+        llm_model.model_name,
+        llm_model.model_role
+    ))
 
 @app.get("/api/conversations", response_model=List[ConversationMetadata])
 async def list_conversations():
@@ -85,6 +105,9 @@ async def send_message(conversation_id: str, request: SendMessageRequest):
     Send a message and run the 3-stage council process.
     Returns the complete response with all stages.
     """
+
+    print("New conversation message")
+
     # Check if conversation exists
     conversation = storage.get_conversation(conversation_id)
     if conversation is None:
@@ -98,11 +121,11 @@ async def send_message(conversation_id: str, request: SendMessageRequest):
 
     # If this is the first message, generate a title
     if is_first_message:
-        title = await generate_conversation_title(request.content)
+        title = await council.generate_conversation_title(request.content)
         storage.update_conversation_title(conversation_id, title)
 
     # Run the 3-stage council process
-    stage1_results, stage2_results, stage3_result, metadata = await run_full_council(
+    stage1_results, stage2_results, stage3_result, metadata = await council.run_full_council(
         request.content
     )
 
@@ -129,6 +152,9 @@ async def send_message_stream(conversation_id: str, request: SendMessageRequest)
     Send a message and stream the 3-stage council process.
     Returns Server-Sent Events as each stage completes.
     """
+
+    print("New conversation message stream")
+
     # Check if conversation exists
     conversation = storage.get_conversation(conversation_id)
     if conversation is None:
@@ -145,22 +171,22 @@ async def send_message_stream(conversation_id: str, request: SendMessageRequest)
             # Start title generation in parallel (don't await yet)
             title_task = None
             if is_first_message:
-                title_task = asyncio.create_task(generate_conversation_title(request.content))
+                title_task = asyncio.create_task(council.generate_conversation_title(request.content))
 
             # Stage 1: Collect responses
             yield f"data: {json.dumps({'type': 'stage1_start'})}\n\n"
-            stage1_results = await stage1_collect_responses(request.content)
+            stage1_results = await council.stage1_collect_responses(request.content)
             yield f"data: {json.dumps({'type': 'stage1_complete', 'data': stage1_results})}\n\n"
 
             # Stage 2: Collect rankings
             yield f"data: {json.dumps({'type': 'stage2_start'})}\n\n"
-            stage2_results, label_to_model = await stage2_collect_rankings(request.content, stage1_results)
-            aggregate_rankings = calculate_aggregate_rankings(stage2_results, label_to_model)
+            stage2_results, label_to_model = await council.stage2_collect_rankings(request.content, stage1_results)
+            aggregate_rankings = council.calculate_aggregate_rankings(stage2_results, label_to_model)
             yield f"data: {json.dumps({'type': 'stage2_complete', 'data': stage2_results, 'metadata': {'label_to_model': label_to_model, 'aggregate_rankings': aggregate_rankings}})}\n\n"
 
             # Stage 3: Synthesize final answer
             yield f"data: {json.dumps({'type': 'stage3_start'})}\n\n"
-            stage3_result = await stage3_synthesize_final(request.content, stage1_results, stage2_results)
+            stage3_result = await council.stage3_synthesize_final(request.content, stage1_results, stage2_results)
             yield f"data: {json.dumps({'type': 'stage3_complete', 'data': stage3_result})}\n\n"
 
             # Wait for title generation if it was started
@@ -195,5 +221,7 @@ async def send_message_stream(conversation_id: str, request: SendMessageRequest)
 
 
 if __name__ == "__main__":
+    print("YEEEEEEET")
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
+    print("YEEEEEt")
