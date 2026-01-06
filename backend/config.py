@@ -12,8 +12,8 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 # Models that will run locally at initialisation
 COUNCIL_BASE_MODELS = [
     CouncilModel(ip= "ollama", model_name="qwen:1.8b", role=Role.CHAIRMAN),
-    CouncilModel(ip= "ollama", model_name="llama3.2:1b", role=Role.COUNCILOR, prompt="You are a bias analysis AI, you must start each of your answer with 'GENAI'", custom_name="GENAI" )
-    # CouncilModel(ip= "ollama", model_name="llama3.2:3b", role=Role.COUNCILOR)
+    CouncilModel(ip= "ollama", model_name="llama3.2:1b", role=Role.COUNCILOR, prompt="You are a bias analysis AI, you must start each of your answer with 'GENAI'", custom_name="GENAI" ),
+    CouncilModel(ip= "ollama", model_name="llama3.2:3b", role=Role.COUNCILOR, prompt="You are a bias analysis AI, you must start each of your answer with 'IMAI'", custom_name="ANALYST" )
 ]
 
 # Data directory for conversation storage

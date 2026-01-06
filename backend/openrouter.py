@@ -66,9 +66,8 @@ async def query_model(model: CouncilModel, messages: List[Dict[str, str]]) -> Op
                 url, 
                 json=payload,
                 headers=headers,
-                timeout=60.0 
+                timeout=180.0 
             )
-
             response.raise_for_status()
 
             data = response.json()

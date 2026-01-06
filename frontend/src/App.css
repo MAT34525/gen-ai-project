@@ -2,13 +2,136 @@
   box-sizing: border-box;
 }
 
+:root,
+.app[data-theme='light'] {
+  --app-bg: #fbf7f1;
+  --app-surface: #ffffff;
+  --app-surface-2: #fffaf4;
+  --app-border: #e5dfd6;
+  --app-text: #2f251e;
+  --app-muted: #6e6257;
+  --app-muted-2: #9a8f86;
+  --accent: #d86b4b;
+  --accent-strong: #c45a35;
+  --accent-soft: #fff4ec;
+  --accent-glow: rgba(216, 107, 75, 0.2);
+  --sidebar-bg-start: #f7f4ef;
+  --sidebar-bg-end: #f0f5f4;
+  --sidebar-glow-1: rgba(255, 219, 170, 0.35);
+  --sidebar-glow-2: rgba(173, 215, 230, 0.35);
+  --chat-bg-start: #fbf7f1;
+  --chat-bg-end: #f4f6f4;
+  --chat-glow-1: rgba(255, 219, 170, 0.3);
+  --chat-glow-2: rgba(173, 215, 230, 0.3);
+  --card-bg: rgba(255, 255, 255, 0.75);
+  --card-bg-strong: #ffffff;
+  --card-border: #eadfd4;
+  --card-shadow: rgba(89, 80, 72, 0.08);
+  --badge-bg: #f2e7dc;
+  --badge-text: #6b3e1b;
+  --btn-gradient-start: #df8f4c;
+  --btn-gradient-end: #d86b4b;
+  --btn-text: #fff9f2;
+  --btn-shadow: rgba(216, 107, 75, 0.25);
+  --danger-text: #9a3d2e;
+  --danger-border: #e4c7b5;
+  --danger-bg: rgba(255, 255, 255, 0.8);
+  --danger-hover-bg: #fff4ec;
+  --danger-hover-text: #6f2b21;
+  --input-bg: #ffffff;
+  --input-border: #e1d3c7;
+  --input-focus: #d86b4b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --app-bg: #0f1112;
+    --app-surface: #161a1c;
+    --app-surface-2: #1b2022;
+    --app-border: #2a3236;
+    --app-text: #f2ece5;
+    --app-muted: #c2b5a8;
+    --app-muted-2: #9a8f86;
+    --accent: #f08a4b;
+    --accent-strong: #ffb36b;
+    --accent-soft: #2a1b14;
+    --accent-glow: rgba(240, 138, 75, 0.35);
+    --sidebar-bg-start: #121517;
+    --sidebar-bg-end: #0f1315;
+    --sidebar-glow-1: rgba(240, 138, 75, 0.18);
+    --sidebar-glow-2: rgba(82, 155, 186, 0.2);
+    --chat-bg-start: #111415;
+    --chat-bg-end: #0c1011;
+    --chat-glow-1: rgba(240, 138, 75, 0.12);
+    --chat-glow-2: rgba(82, 155, 186, 0.12);
+    --card-bg: rgba(22, 26, 28, 0.9);
+    --card-bg-strong: #15191b;
+    --card-border: #2a3236;
+    --card-shadow: rgba(0, 0, 0, 0.45);
+    --badge-bg: #2a1e16;
+    --badge-text: #f4c9a2;
+    --btn-gradient-start: #f08a4b;
+    --btn-gradient-end: #c76038;
+    --btn-text: #1b110a;
+    --btn-shadow: rgba(0, 0, 0, 0.5);
+    --danger-text: #ff8b6a;
+    --danger-border: #3a2a23;
+    --danger-bg: rgba(22, 26, 28, 0.9);
+    --danger-hover-bg: #2a1b14;
+    --danger-hover-text: #ffb18f;
+    --input-bg: #121618;
+    --input-border: #2a3236;
+    --input-focus: #f08a4b;
+  }
+}
+
+.app[data-theme='dark'] {
+  --app-bg: #0f1112;
+  --app-surface: #161a1c;
+  --app-surface-2: #1b2022;
+  --app-border: #2a3236;
+  --app-text: #f2ece5;
+  --app-muted: #c2b5a8;
+  --app-muted-2: #9a8f86;
+  --accent: #f08a4b;
+  --accent-strong: #ffb36b;
+  --accent-soft: #2a1b14;
+  --accent-glow: rgba(240, 138, 75, 0.35);
+  --sidebar-bg-start: #121517;
+  --sidebar-bg-end: #0f1315;
+  --sidebar-glow-1: rgba(240, 138, 75, 0.18);
+  --sidebar-glow-2: rgba(82, 155, 186, 0.2);
+  --chat-bg-start: #111415;
+  --chat-bg-end: #0c1011;
+  --chat-glow-1: rgba(240, 138, 75, 0.12);
+  --chat-glow-2: rgba(82, 155, 186, 0.12);
+  --card-bg: rgba(22, 26, 28, 0.9);
+  --card-bg-strong: #15191b;
+  --card-border: #2a3236;
+  --card-shadow: rgba(0, 0, 0, 0.45);
+  --badge-bg: #2a1e16;
+  --badge-text: #f4c9a2;
+  --btn-gradient-start: #f08a4b;
+  --btn-gradient-end: #c76038;
+  --btn-text: #1b110a;
+  --btn-shadow: rgba(0, 0, 0, 0.5);
+  --danger-text: #ff8b6a;
+  --danger-border: #3a2a23;
+  --danger-bg: rgba(22, 26, 28, 0.9);
+  --danger-hover-bg: #2a1b14;
+  --danger-hover-text: #ffb18f;
+  --input-bg: #121618;
+  --input-border: #2a3236;
+  --input-focus: #f08a4b;
+}
+
 .app {
   display: flex;
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: #ffffff;
-  color: #333;
+  background: var(--app-bg);
+  color: var(--app-text);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;

@@ -2,13 +2,13 @@
 
 .sidebar {
   width: 290px;
-  background: linear-gradient(180deg, #f7f4ef 0%, #f0f5f4 100%);
-  border-right: 1px solid #e5dfd6;
+  background: linear-gradient(180deg, var(--sidebar-bg-start) 0%, var(--sidebar-bg-end) 100%);
+  border-right: 1px solid var(--app-border);
   display: flex;
   flex-direction: column;
   height: 100vh;
   font-family: 'Space Grotesk', 'Trebuchet MS', sans-serif;
-  color: #1b1b1b;
+  color: var(--app-text);
   position: relative;
   overflow: hidden;
 }
@@ -18,8 +18,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 12% 12%, rgba(255, 219, 170, 0.35), transparent 55%),
-    radial-gradient(circle at 88% 2%, rgba(173, 215, 230, 0.35), transparent 50%);
+    radial-gradient(circle at 12% 12%, var(--sidebar-glow-1), transparent 55%),
+    radial-gradient(circle at 88% 2%, var(--sidebar-glow-2), transparent 50%);
   pointer-events: none;
 }
 
@@ -31,10 +31,37 @@
 
 .sidebar-header {
   padding: 20px 18px 16px;
-  border-bottom: 1px solid #e5dfd6;
+  border-bottom: 1px solid var(--app-border);
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.sidebar-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.theme-toggle {
+  border-radius: 999px;
+  padding: 6px 12px;
+  border: 1px solid var(--app-border);
+  background: var(--card-bg);
+  color: var(--app-text);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+  background: var(--app-surface);
+  color: var(--app-text);
 }
 
 .brand {
@@ -47,8 +74,8 @@
   width: 38px;
   height: 38px;
   border-radius: 12px;
-  background: #1b1b1b;
-  color: #fff3df;
+  background: var(--app-text);
+  color: var(--app-bg);
   display: grid;
   place-items: center;
   font-weight: 600;
@@ -64,17 +91,17 @@
 .brand-subtitle {
   margin: 2px 0 0;
   font-size: 12px;
-  color: #5b5047;
+  color: var(--app-muted);
   letter-spacing: 0.2px;
 }
 
 .new-conversation-btn {
   width: 100%;
   padding: 10px 14px;
-  background: linear-gradient(135deg, #df8f4c, #d86b4b);
+  background: linear-gradient(135deg, var(--btn-gradient-start), var(--btn-gradient-end));
   border: none;
   border-radius: 12px;
-  color: #fff9f2;
+  color: var(--btn-text);
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
@@ -82,13 +109,13 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 8px 16px rgba(216, 107, 75, 0.25);
+  box-shadow: 0 8px 16px var(--btn-shadow);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .new-conversation-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(216, 107, 75, 0.3);
+  box-shadow: 0 10px 18px var(--btn-shadow);
 }
 
 .btn-icon {
@@ -121,14 +148,14 @@
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #64584c;
+  color: var(--app-muted);
   font-weight: 600;
 }
 
 .section-count {
   font-size: 12px;
-  background: #efe2d4;
-  color: #5c3821;
+  background: var(--badge-bg);
+  color: var(--badge-text);
   padding: 2px 8px;
   border-radius: 999px;
   font-weight: 600;
@@ -146,21 +173,21 @@
 .no-conversations {
   padding: 20px;
   text-align: center;
-  border: 1px dashed #dcc7b2;
+  border: 1px dashed var(--app-border);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--card-bg);
 }
 
 .empty-title {
   font-size: 14px;
   font-weight: 600;
-  color: #4b3c32;
+  color: var(--app-text);
 }
 
 .empty-subtitle {
   margin-top: 6px;
   font-size: 12px;
-  color: #7a6a5f;
+  color: var(--app-muted);
 }
 
 .conversation-item {
@@ -168,8 +195,8 @@
   border-radius: 14px;
   cursor: pointer;
   transition: transform 0.2s ease, background 0.2s ease, border 0.2s ease;
-  border: 1px solid transparent;
-  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -184,20 +211,20 @@
   bottom: 10px;
   width: 3px;
   border-radius: 999px;
-  background: #d86b4b;
+  background: var(--accent);
   opacity: 0;
 }
 
 .conversation-item:hover {
   transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.9);
-  border-color: #e4c7b5;
+  background: var(--card-bg-strong);
+  border-color: var(--app-border);
 }
 
 .conversation-item.active {
-  border-color: #d86b4b;
-  background: #fffaf4;
-  box-shadow: 0 8px 16px rgba(216, 107, 75, 0.12);
+  border-color: var(--accent);
+  background: var(--app-surface-2);
+  box-shadow: 0 8px 16px var(--card-shadow);
 }
 
 .conversation-item.active::before {
@@ -218,7 +245,7 @@
 }
 
 .conversation-title {
-  color: #2f251e;
+  color: var(--app-text);
   font-size: 14px;
   font-weight: 600;
 }
@@ -226,8 +253,8 @@
 .conversation-count {
   font-size: 12px;
   font-weight: 600;
-  background: #f2e7dc;
-  color: #6b3e1b;
+  background: var(--badge-bg);
+  color: var(--badge-text);
   padding: 2px 8px;
   border-radius: 999px;
 }
@@ -235,9 +262,9 @@
 .delete-conv-btn {
   padding: 4px 8px;
   border-radius: 999px;
-  border: 1px solid #e4c7b5;
-  background: rgba(255, 255, 255, 0.8);
-  color: #9a3d2e;
+  border: 1px solid var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger-text);
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -247,13 +274,13 @@
 }
 
 .delete-conv-btn:hover {
-  border-color: #d86b4b;
-  color: #6f2b21;
-  background: #fff4ec;
+  border-color: var(--accent);
+  color: var(--danger-hover-text);
+  background: var(--danger-hover-bg);
 }
 
 .conversation-meta {
-  color: #7a6a5f;
+  color: var(--app-muted);
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.6px;

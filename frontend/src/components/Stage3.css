@@ -1,18 +1,18 @@
 .stage3 {
-  background: #f3fbf2;
-  border-color: #cfe7cf;
+  background: var(--app-surface-2);
+  border-color: var(--card-border);
 }
 
 .final-response {
-  background: #ffffff;
+  background: var(--app-surface);
   padding: 20px;
   border-radius: 12px;
-  border: 1px solid #d6e7d6;
-  box-shadow: 0 10px 18px rgba(47, 122, 74, 0.08);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 10px 18px var(--card-shadow);
 }
 
 .chairman-label {
-  color: #2f7a4a;
+  color: var(--accent-strong);
   font-size: 12px;
   font-family: monospace;
   margin-bottom: 12px;
@@ -22,7 +22,7 @@
 }
 
 .final-text {
-  color: #2f251e;
+  color: var(--app-text);
   line-height: 1.7;
   font-size: 15px;
 }

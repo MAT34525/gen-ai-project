@@ -6,11 +6,22 @@ export default function Sidebar({
   onSelectConversation,
   onNewConversation,
   onDeleteConversation,
+  theme,
+  onToggleTheme,
 }) {
   return (
     <div className="sidebar">
       <div className="sidebar-header">
-        <h1>Biais Detector Council</h1>
+        <div className="sidebar-title-row">
+          <h1>Biais Detector Council</h1>
+          <button
+            type="button"
+            className="theme-toggle"
+            onClick={onToggleTheme}
+          >
+            {theme === 'dark' ? 'Light' : 'Dark'}
+          </button>
+        </div>
         <button className="new-conversation-btn" onClick={onNewConversation}>
           + New Conversation
         </button>
@@ -33,7 +44,6 @@ export default function Sidebar({
                   {conv.title || 'New Conversation'}
                 </div>
                 <div className="conversation-actions">
-                  <div className="conversation-count">{conv.message_count}</div>
                   <button
                     type="button"
                     className="delete-conv-btn"

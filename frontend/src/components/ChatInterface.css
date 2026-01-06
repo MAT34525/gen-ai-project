@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: linear-gradient(180deg, #fbf7f1 0%, #f4f6f4 100%);
+  background: linear-gradient(180deg, var(--chat-bg-start) 0%, var(--chat-bg-end) 100%);
   font-family: 'Space Grotesk', 'Trebuchet MS', sans-serif;
   position: relative;
   overflow: hidden;
@@ -16,8 +16,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 8% 20%, rgba(255, 219, 170, 0.3), transparent 60%),
-    radial-gradient(circle at 92% 0%, rgba(173, 215, 230, 0.3), transparent 55%);
+    radial-gradient(circle at 8% 20%, var(--chat-glow-1), transparent 60%),
+    radial-gradient(circle at 92% 0%, var(--chat-glow-2), transparent 55%);
   pointer-events: none;
 }
 
@@ -35,7 +35,7 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #6e6257;
+  color: var(--app-muted);
   text-align: center;
   gap: 6px;
 }
@@ -43,7 +43,7 @@
 .empty-state h2 {
   margin: 0;
   font-size: 26px;
-  color: #2f251e;
+  color: var(--app-text);
   font-family: 'Fraunces', 'Times New Roman', serif;
 }
 
@@ -76,22 +76,22 @@
 .message-label {
   font-size: 11px;
   font-weight: 600;
-  color: #6f6258;
+  color: var(--app-muted);
   margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
 .user-message .message-content {
-  background: #fff6ed;
+  background: var(--app-surface-2);
   padding: 16px 18px;
   border-radius: 14px;
-  border: 1px solid #f0d5c3;
-  color: #2f251e;
+  border: 1px solid var(--card-border);
+  color: var(--app-text);
   line-height: 1.6;
   max-width: 78%;
   white-space: pre-wrap;
-  box-shadow: 0 10px 18px rgba(216, 107, 75, 0.08);
+  box-shadow: 0 10px 18px var(--card-shadow);
 }
 
 .markdown-content {
@@ -99,11 +99,11 @@
 }
 
 .assistant-message {
-  background: rgba(255, 255, 255, 0.75);
-  border: 1px solid #eadfd4;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 16px;
   padding: 14px 16px 18px;
-  box-shadow: 0 10px 20px rgba(89, 80, 72, 0.08);
+  box-shadow: 0 10px 20px var(--card-shadow);
   position: relative;
 }
 
@@ -115,7 +115,7 @@
   bottom: 14px;
   width: 3px;
   border-radius: 999px;
-  background: #d86b4b;
+  background: var(--accent);
 }
 
 .loading-indicator {
@@ -123,11 +123,11 @@
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  color: #6e6257;
+  color: var(--app-muted);
   font-size: 14px;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--card-bg);
   border-radius: 12px;
-  border: 1px solid #eadfd4;
+  border: 1px solid var(--card-border);
 }
 
 .stage-loading {
@@ -136,10 +136,10 @@
   gap: 12px;
   padding: 14px 16px;
   margin: 12px 0;
-  background: #fffaf4;
+  background: var(--app-surface-2);
   border-radius: 12px;
-  border: 1px dashed #e2cbb6;
-  color: #6e6257;
+  border: 1px dashed var(--app-border);
+  color: var(--app-muted);
   font-size: 13px;
   font-style: italic;
 }
@@ -147,8 +147,8 @@
 .spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid #eadfd4;
-  border-top-color: #d86b4b;
+  border: 2px solid var(--card-border);
+  border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -164,8 +164,8 @@
   align-items: flex-end;
   gap: 12px;
   padding: 18px 24px 22px;
-  border-top: 1px solid #e5dfd6;
-  background: rgba(255, 255, 255, 0.75);
+  border-top: 1px solid var(--app-border);
+  background: var(--card-bg);
   backdrop-filter: blur(6px);
   position: relative;
   z-index: 1;
@@ -174,10 +174,10 @@
 .message-input {
   flex: 1;
   padding: 14px 16px;
-  background: #ffffff;
-  border: 1px solid #e1d3c7;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
   border-radius: 12px;
-  color: #2f251e;
+  color: var(--app-text);
   font-size: 15px;
   font-family: inherit;
   line-height: 1.5;
@@ -189,40 +189,40 @@
 }
 
 .message-input:focus {
-  border-color: #d86b4b;
-  box-shadow: 0 0 0 3px rgba(216, 107, 75, 0.15);
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
 .message-input:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  background: #f5f1ed;
+  background: var(--app-surface);
 }
 
 .send-button {
   padding: 14px 26px;
-  background: linear-gradient(135deg, #df8f4c, #d86b4b);
+  background: linear-gradient(135deg, var(--btn-gradient-start), var(--btn-gradient-end));
   border: none;
   border-radius: 12px;
-  color: #fff9f2;
+  color: var(--btn-text);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   white-space: nowrap;
   align-self: flex-end;
-  box-shadow: 0 10px 16px rgba(216, 107, 75, 0.2);
+  box-shadow: 0 10px 16px var(--btn-shadow);
 }
 
 .send-button:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 12px 20px rgba(216, 107, 75, 0.26);
+  box-shadow: 0 12px 20px var(--btn-shadow);
 }
 
 .send-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background: #d1c5bb;
+  background: var(--app-border);
   box-shadow: none;
 }
 
