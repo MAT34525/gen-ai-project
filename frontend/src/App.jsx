@@ -57,6 +57,8 @@ function App() {
     setCurrentConversationId(id);
   };
 
+ 
+
   const handleSendMessage = async (content) => {
     if (!currentConversationId) return;
 
@@ -194,6 +196,7 @@ function App() {
         currentConversationId={currentConversationId}
         onSelectConversation={handleSelectConversation}
         onNewConversation={handleNewConversation}
+        onDeleteConversation={handleDeleteConversation}
       />
       <ChatInterface
         conversation={currentConversation}
