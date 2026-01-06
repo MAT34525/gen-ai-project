@@ -2,7 +2,7 @@
 
 from typing import List, Dict, Any, Tuple
 from openrouter import query_models_parallel, query_model
-from config import COUNCIL_MODELS, CHAIRMAN_MODEL, COUNCIL_BASE_MODELS
+from config import COUNCIL_BASE_MODELS
 from models import Role, ModelType
 
 class Council() :
