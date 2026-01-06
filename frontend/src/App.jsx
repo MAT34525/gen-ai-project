@@ -93,6 +93,7 @@ function App() {
       await api.sendMessageStream(currentConversationId, content, (eventType, event) => {
         switch (eventType) {
           case 'stage1_start':
+            console.log("Start Stage 1")
             setCurrentConversation((prev) => {
               const messages = [...prev.messages];
               const lastMsg = messages[messages.length - 1];
@@ -102,6 +103,7 @@ function App() {
             break;
 
           case 'stage1_complete':
+            console.info("End Stage 1")
             setCurrentConversation((prev) => {
               const messages = [...prev.messages];
               const lastMsg = messages[messages.length - 1];
@@ -112,6 +114,7 @@ function App() {
             break;
 
           case 'stage2_start':
+            console.info("Start Stage 2")
             setCurrentConversation((prev) => {
               const messages = [...prev.messages];
               const lastMsg = messages[messages.length - 1];
@@ -121,6 +124,7 @@ function App() {
             break;
 
           case 'stage2_complete':
+            console.info("End Stage 2")
             setCurrentConversation((prev) => {
               const messages = [...prev.messages];
               const lastMsg = messages[messages.length - 1];
@@ -132,6 +136,7 @@ function App() {
             break;
 
           case 'stage3_start':
+            console.info("Start Stage 3")
             setCurrentConversation((prev) => {
               const messages = [...prev.messages];
               const lastMsg = messages[messages.length - 1];
@@ -141,6 +146,7 @@ function App() {
             break;
 
           case 'stage3_complete':
+            console.info("End Stage 3")
             setCurrentConversation((prev) => {
               const messages = [...prev.messages];
               const lastMsg = messages[messages.length - 1];
