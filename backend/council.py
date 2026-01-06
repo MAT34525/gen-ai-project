@@ -3,23 +3,24 @@
 from typing import List, Dict, Any, Tuple
 from openrouter import query_models_parallel, query_model
 from config import COUNCIL_MODELS, CHAIRMAN_MODEL, COUNCIL_BASE_MODELS
-from models import Role
+from models import Role, ModelType
 
 class Council() :
 
     def __init__(self) :
 
-        self.chairman = COUNCIL_BASE_MODELS[0]
+        self.models = COUNCIL_BASE_MODELS
+
+        for model in self.models:
+            model.pull()
+
+            if model.model_type == ModelType.CUSTOM :
+                model.create()
+        
+        self.chairman = self.models[0]
+        self.models = self.models[1:]
 
         assert self.chairman.model_role == Role.CHAIRMAN
-
-        self.models = COUNCIL_BASE_MODELS[1:]
-
-        self.chairman.pull()
-
-        for model in self.models :
-
-            model.pull()
 
     async def stage1_collect_responses(self, user_query: str) -> List[Dict[str, Any]]:
         """
@@ -246,25 +247,16 @@ class Council() :
         # Track positions for each model
         model_positions = defaultdict(list)
 
-        print("Stage 2 results :")
-        print(stage2_results)
-
         for ranking in stage2_results:
             ranking_text = ranking['ranking']
 
-            print(ranking_text)
-
             # Parse the ranking from the structured format
             parsed_ranking = Council.parse_ranking_from_text(ranking_text)
-
-            print(parsed_ranking)
 
             for position, label in enumerate(parsed_ranking, start=1):
                 if label in label_to_model:
                     model_name = label_to_model[label]
                     model_positions[model_name].append(position)
-
-        print(model_positions)
 
         # Calculate average position for each model
         aggregate = []
@@ -332,12 +324,8 @@ class Council() :
             Tuple of (stage1_results, stage2_results, stage3_result, metadata)
         """
 
-        print("Run full model")
-
-        print("Start Stage 1")
         # Stage 1: Collect individual responses
         stage1_results = await self.stage1_collect_responses(user_query)
-        print("End Stage 1")
 
         # If no models responded successfully, return error
         if not stage1_results:
@@ -346,22 +334,18 @@ class Council() :
                 "response": "All models failed to respond. Please try again."
             }, {}
 
-        print("Start Stage 2")
         # Stage 2: Collect rankings
         stage2_results, label_to_model = await self.stage2_collect_rankings(user_query, stage1_results)
-        print("End Stage 2")
 
         # Calculate aggregate rankings
         aggregate_rankings = self.calculate_aggregate_rankings(stage2_results, label_to_model)
 
-        print("Start Stage 3")
         # Stage 3: Synthesize final answer
         stage3_result = await self.stage3_synthesize_final(
             user_query,
             stage1_results,
             stage2_results
         )
-        print("End Stage 3")
 
         # Prepare metadata
         metadata = {

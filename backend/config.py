@@ -12,30 +12,12 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 # Models that will run locally at initialisation
 COUNCIL_BASE_MODELS = [
     CouncilModel(ip= "ollama", model_name="qwen:1.8b", role=Role.CHAIRMAN),
-    CouncilModel(ip= "ollama", model_name="llama3.2:1b", role=Role.COUNCILOR),
-    CouncilModel(ip= "ollama", model_name="llama3.2:3b", role=Role.COUNCILOR)
+    CouncilModel(ip= "ollama", model_name="llama3.2:1b", role=Role.COUNCILOR, prompt="You are a bias analysis AI, you must start each of your answer with 'GENAI'", custom_name="GENAI" )
+    # CouncilModel(ip= "ollama", model_name="llama3.2:3b", role=Role.COUNCILOR)
 ]
-
-# Council members - list of OpenRouter model identifiers
-COUNCIL_MODELS = [
-    "openai/gpt-5.1",
-    "google/gemini-3-pro-preview",
-    "anthropic/claude-sonnet-4.5",
-    "x-ai/grok-4",
-]
-
-# Chairman model - synthesizes final response
-CHAIRMAN_MODEL = "google/gemini-3-pro-preview"
-
-# OpenRouter API endpoint
-OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # Data directory for conversation storage
 DATA_DIR = "data/conversations"
-
-# Ollama pour partie de matheo
-OLLAMA_URL = 'http://localhost:11434/api/generate'
-OLLAMA_MODEL = "qwen2.5:3b"
 
 # Liste des biais cognitif étudiés et recherchés
 CATEGORIES_BIAIS_ESSENTIELS = {

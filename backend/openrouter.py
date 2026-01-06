@@ -3,7 +3,6 @@
 import httpx
 from typing import List, Dict, Any, Optional
 
-from config import OPENROUTER_API_KEY, OPENROUTER_API_URL, OLLAMA_URL, OLLAMA_MODEL
 from models import CouncilModel
 
 #code matheo
@@ -74,15 +73,11 @@ async def query_model(model: CouncilModel, messages: List[Dict[str, str]]) -> Op
 
             data = response.json()
 
-            print("Data :")
-            print(data)
-
             return {
                 'content': data['message']['content'],
                 'reasoning_details': None
             }
     except Exception as e:
-        print(e)
         print(f"Erreur lors de la requête vers {model}: {e}")
         return None
 
@@ -96,11 +91,7 @@ async def query_models_parallel(models: List[CouncilModel], messages: List[Dict[
     # Wait for all to complete
     responses = await asyncio.gather(*tasks)
 
-    print(models)
-    print(responses)
-
     # Map models to their responses
     resp = {model.model_name: response for model, response in zip(models, responses)}
 
-    print(resp)
     return resp
