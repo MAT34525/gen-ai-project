@@ -67,6 +67,7 @@ async def query_model(model: CouncilModel, messages: List[Dict[str, str]]) -> Op
                 json=payload,
                 headers=headers,
                 timeout=180.0 
+
             )
             response.raise_for_status()
 
@@ -76,6 +77,7 @@ async def query_model(model: CouncilModel, messages: List[Dict[str, str]]) -> Op
                 'content': data['message']['content'],
                 'reasoning_details': None
             }
+        
     except Exception as e:
         print(f"Erreur lors de la requête vers {model}: {e}")
         return None
