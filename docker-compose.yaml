@@ -1,0 +1,42 @@
+services:
+  backend:
+    depends_on:
+      - ollama
+    build: backend
+    ports: 
+      - 8001:8001
+    networks:
+      - council-network
+
+  frontend:
+    build: frontend
+    depends_on:
+      - backend
+    ports: 
+      - 5173:5173
+    networks:
+      - council-network
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - council-network
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+volumes:
+  ollama_data:
+    name: ollama_data
+
+networks:
+  council-network:
