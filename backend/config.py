@@ -51,7 +51,7 @@ CATEGORIES_BIAIS_ESSENTIELS = """
         Optimisme irréaliste
 """
 
-PROMPT_PRE_INJECTION = """
+PROMPT_PRE_INJECTION = f"""
 Rôle : Expert en analyse critique.
     Tâche : Analyse le texte pour trouver UNIQUEMENT ces biais : 
     
