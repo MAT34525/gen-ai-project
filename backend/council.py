@@ -30,7 +30,7 @@ class Council() :
     # On utilise un message 'system' pour définir le comportement
         messages = [{
             "role": "system", 
-            "content": PROMPT_PRE_INJECTION.format(categories=CATEGORIES_BIAIS_ESSENTIELS)
+            "content": PROMPT_PRE_INJECTION
             },
             {
                 "role": "user", 
