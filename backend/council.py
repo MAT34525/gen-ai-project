@@ -23,15 +23,7 @@ class Council() :
         assert self.chairman.model_role == Role.CHAIRMAN
 
     async def stage1_collect_responses(self, user_query: str) -> List[Dict[str, Any]]:
-        """
-        Stage 1: Collect individual responses from all council models.
 
-        Args:
-            user_query: The user's question
-
-        Returns:
-            List of dicts with 'model' and 'response' keys
-        """
         messages = [{"role": "user", "content": user_query}]
 
         # Query all models in parallel
@@ -54,16 +46,7 @@ class Council() :
         user_query: str,
         stage1_results: List[Dict[str, Any]]
     ) -> Tuple[List[Dict[str, Any]], Dict[str, str]]:
-        """
-        Stage 2: Each model ranks the anonymized responses.
 
-        Args:
-            user_query: The original user query
-            stage1_results: Results from Stage 1
-
-        Returns:
-            Tuple of (rankings list, label_to_model mapping)
-        """
         # Create anonymized labels for responses (Response A, Response B, etc.)
         labels = [chr(65 + i) for i in range(len(stage1_results))]  # A, B, C, ...
 
@@ -79,36 +62,38 @@ class Council() :
             for label, result in zip(labels, stage1_results)
         ])
 
-        ranking_prompt = f"""You are evaluating different responses to the following question:
+        ranking_prompt = f"""Rôle: Juge impartial
+    Tu dois évaluer les différentes réponses des modèles d'IA pour la détection des biais cognitif dans une phrase :
 
-    Question: {user_query}
+    Phrase à analyser : {user_query}
 
-    Here are the responses from different models (anonymized):
+    Voici les réponses des différents modèles (anonymized):
 
     {responses_text}
 
-    Your task:
-    1. First, evaluate each response individually. For each response, explain what it does well and what it does poorly.
-    2. Then, at the very end of your response, provide a final ranking.
+    Tes tâches:
+    1. En premier, évalue chaques réponses individuellement. Pour chaques réponses, explique ce qui est bien fait et ce qui est est mal fait.
+    2. Ensuite, à la fin de chaques réponses, donne une note finale.
 
-    IMPORTANT: Your final ranking MUST be formatted EXACTLY as follows:
-    - Start with the line "FINAL RANKING:" (all caps, with colon)
-    - Then list the responses from best to worst as a numbered list
-    - Each line should be: number, period, space, then ONLY the response label (e.g., "1. Response A")
-    - Do not add any other text or explanations in the ranking section
+    IMPORTANT: La note finale DOIT être EXACTEMENT formattée de cette manière :
 
-    Example of the correct format for your ENTIRE response:
+    - Commencez par la ligne « CLASSEMENT FINAL : » (en majuscules, avec deux points)
+    - Listez ensuite les réponses de la meilleure à la moins bonne sous forme de liste numérotée.
+    - Chaque ligne doit contenir : un numéro, un point, un espace, puis UNIQUEMENT le libellé de la réponse (par exemple, « 1. Réponse A »).
+    - N'ajoutez aucun autre texte ni explication dans la section du classement.
 
-    Response A provides good detail on X but misses Y...
-    Response B is accurate but lacks depth on Z...
-    Response C offers the most comprehensive answer...
+    Exemple de format correct pour votre réponse COMPLÈTE :
 
-    FINAL RANKING:
-    1. Response C
-    2. Response A
-    3. Response B
+    La réponse A fournit des détails pertinents sur X, mais omet Y…
+    La réponse B est exacte, mais manque de profondeur sur Z…
+    La réponse C offre la réponse la plus complète…
 
-    Now provide your evaluation and ranking:"""
+    NOTE FINALE:
+    1. Réponse C
+    2. Réponse A
+    3. Réponse B
+    
+    Veuillez maintenant fournir votre évaluation et votre classement :"""
 
         messages = [{"role": "user", "content": ranking_prompt}]
 
@@ -136,17 +121,7 @@ class Council() :
         stage1_results: List[Dict[str, Any]],
         stage2_results: List[Dict[str, Any]]
     ) -> Dict[str, Any]:
-        """
-        Stage 3: Chairman synthesizes final response.
 
-        Args:
-            user_query: The original user query
-            stage1_results: Individual model responses from Stage 1
-            stage2_results: Rankings from Stage 2
-
-        Returns:
-            Dict with 'model' and 'response' keys
-        """
         # Build comprehensive context for chairman
         stage1_text = "\n\n".join([
             f"Model: {result['model']}\nResponse: {result['response']}"
@@ -158,22 +133,23 @@ class Council() :
             for result in stage2_results
         ])
 
-        chairman_prompt = f"""You are the Chairman of an LLM Council. Multiple AI models have provided responses to a user's question, and then ranked each other's responses.
+        chairman_prompt = f"""Vous êtes le président d'un conseil de master en droit. Plusieurs modèles d'IA ont analyser les biais cognitifs dans une phrase, puis ont classé leurs réponses respectives.
 
-    Original Question: {user_query}
+    Phrase à analyser : {user_query}
 
-    STAGE 1 - Individual Responses:
+    Etape 1 - Réponse individuelle :
     {stage1_text}
 
-    STAGE 2 - Peer Rankings:
+    Etape 2 - Classement des pairs :
     {stage2_text}
+    
+    Votre rôle de président est de synthétiser toutes ces informations afin de fournir une réponse unique, complète et précise à la question initiale de l'utilisateur. Prenez en compte :
 
-    Your task as Chairman is to synthesize all of this information into a single, comprehensive, accurate answer to the user's original question. Consider:
-    - The individual responses and their insights
-    - The peer rankings and what they reveal about response quality
-    - Any patterns of agreement or disagreement
-
-    Provide a clear, well-reasoned final answer that represents the council's collective wisdom:"""
+    - Les réponses individuelles et les enseignements qu'elles apportent
+    - Les classements par les pairs et ce qu'ils révèlent sur la qualité des réponses
+    - Les éventuels points de convergence ou de divergence
+    
+    Fournir une réponse finale claire et bien argumentée qui représente la sagesse collective du conseil :"""
 
         messages = [{"role": "user", "content": chairman_prompt}]
 
@@ -184,7 +160,7 @@ class Council() :
             # Fallback if chairman fails
             return {
                 "model": self.chairman.model_name,
-                "response": "Error: Unable to generate final synthesis."
+                "response": "Error: Impossible de générer la synthèse finale."
             }
 
         return {
@@ -232,16 +208,6 @@ class Council() :
         stage2_results: List[Dict[str, Any]],
         label_to_model: Dict[str, str]
     ) -> List[Dict[str, Any]]:
-        """
-        Calculate aggregate rankings across all models.
-
-        Args:
-            stage2_results: Rankings from each model
-            label_to_model: Mapping from anonymous labels to model names
-
-        Returns:
-            List of dicts with model name and average rank, sorted best to worst
-        """
         from collections import defaultdict
 
         # Track positions for each model
@@ -276,19 +242,10 @@ class Council() :
 
 
     async def generate_conversation_title(self, user_query: str) -> str:
-        """
-        Generate a short title for a conversation based on the first user message.
+        title_prompt = f"""Créez un titre très court (3 à 5 mots maximum) qui résume la phrase suivante.
+    Le titre doit être concis et descriptif. N'utilisez ni guillemets ni ponctuation.
 
-        Args:
-            user_query: The first user message
-
-        Returns:
-            A short title (3-5 words)
-        """
-        title_prompt = f"""Generate a very short title (3-5 words maximum) that summarizes the following question.
-    The title should be concise and descriptive. Do not use quotes or punctuation in the title.
-
-    Question: {user_query}
+    Phrase: {user_query}
 
     Title:"""
 
@@ -299,9 +256,9 @@ class Council() :
 
         if response is None:
             # Fallback to a generic title
-            return "New Conversation"
+            return "Nouvelle conversation"
 
-        title = response.get('message.content', 'New Conversation').strip()
+        title = response.get('message.content', 'Nouvelle conversation').strip()
 
         # Clean up the title - remove quotes, limit length
         title = title.strip('"\'')
@@ -314,16 +271,6 @@ class Council() :
 
 
     async def run_full_council(self, user_query: str) -> Tuple[List, List, Dict, Dict]:
-        """
-        Run the complete 3-stage council process.
-
-        Args:
-            user_query: The user's question
-
-        Returns:
-            Tuple of (stage1_results, stage2_results, stage3_result, metadata)
-        """
-
         # Stage 1: Collect individual responses
         stage1_results = await self.stage1_collect_responses(user_query)
 
@@ -331,7 +278,7 @@ class Council() :
         if not stage1_results:
             return [], [], {
                 "model": "error",
-                "response": "All models failed to respond. Please try again."
+                "response": "Aucun modèle n'a réussi à répondre. Veuillez réessayer."
             }, {}
 
         # Stage 2: Collect rankings
