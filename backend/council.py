@@ -23,33 +23,30 @@ class Council() :
         assert self.chairman.model_role == Role.CHAIRMAN
 
     async def stage1_collect_responses(self, user_query: str) -> List[Dict[str, Any]]:
-    # On prépare les catégories pour l'injection si nécessaire
-    categories_str = ", ".join(CATEGORIES_BIAIS_ESSENTIELS.keys())
-    
+
     # On utilise un message 'system' pour définir le comportement
-    messages = [
-        "role": "system", 
-            "content": PROMPT_PRE_INJECTION.format(categories=categories_str)
-        },
-        {
-            "role": "user", 
-            "content": f"Voici le texte à analyser : '{user_query}'"
-        }
-    ]
+        messages = [{
+            "role": "system", 
+            "content": PROMPT_PRE_INJECTION.format(categories=CATEGORIES_BIAIS_ESSENTIELS)
+            },
+            {
+                "role": "user", 
+                "content": f"Voici le texte à analyser : '{user_query}'"
+            }
+        ]
 
-    # Appel parallèle des modèles
-    responses = await query_models_parallel(self.models, messages)
+        # Appel parallèle des modèles
+        responses = await query_models_parallel(self.models, messages)
 
-    # Formatage des résultats
-    stage1_results = []
-    for model, response in responses.items():
-        if response and 'content' in response:
-            stage1_results.append({
-                "model": model,
-                "response": response['content']
-            })
-
-    return stage1_results
+        # Formatage des résultats
+        stage1_results = []
+        for model, response in responses.items():
+            if response and 'content' in response:
+                stage1_results.append({
+                    "model": model,
+                    "response": response['content']
+                })
+        return stage1_results
 
 
     async def stage2_collect_rankings(
@@ -93,16 +90,16 @@ class Council() :
     - Chaque ligne doit contenir : un numéro, un point, un espace, puis UNIQUEMENT le libellé de la réponse (par exemple, « 1. Réponse A »).
     - N'ajoutez aucun autre texte ni explication dans la section du classement.
 
-    Exemple de format correct pour votre réponse COMPLÈTE :
+    Exemple de format de réponses :
 
     La réponse A fournit des détails pertinents sur X, mais omet Y…
     La réponse B est exacte, mais manque de profondeur sur Z…
     La réponse C offre la réponse la plus complète…
 
-    NOTE FINALE:
-    1. Réponse C
-    2. Réponse A
-    3. Réponse B
+    FINAL RANKING:
+    1. Réponse ...
+    2. Réponse ...
+    3. Réponse ...
     
     Veuillez maintenant fournir votre évaluation et votre classement :"""
 
