@@ -1,14 +1,15 @@
 .stage {
   margin: 24px 0;
   padding: 20px;
-  background: #fafafa;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  background: var(--app-surface-2);
+  border-radius: 16px;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 10px 20px var(--card-shadow);
 }
 
 .stage-title {
   margin: 0 0 16px 0;
-  color: #333;
+  color: var(--app-text);
   font-size: 16px;
   font-weight: 600;
 }
@@ -22,44 +23,45 @@
 
 .tab {
   padding: 8px 16px;
-  background: #ffffff;
-  border: 1px solid #d0d0d0;
-  border-radius: 6px 6px 0 0;
-  color: #666;
+  background: var(--card-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  color: var(--app-muted);
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .tab:hover {
-  background: #f0f0f0;
-  color: #333;
-  border-color: #4a90e2;
+  background: var(--app-surface);
+  color: var(--app-text);
+  border-color: var(--accent);
 }
 
 .tab.active {
-  background: #ffffff;
-  color: #4a90e2;
-  border-color: #4a90e2;
-  border-bottom-color: #ffffff;
+  background: var(--app-surface);
+  color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 8px 14px var(--card-shadow);
   font-weight: 600;
 }
 
 .tab-content {
-  background: #ffffff;
+  background: var(--app-surface);
   padding: 16px;
-  border-radius: 6px;
-  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
 }
 
 .model-name {
-  color: #888;
+  color: var(--app-muted-2);
   font-size: 12px;
   margin-bottom: 12px;
   font-family: monospace;
 }
 
 .response-text {
-  color: #333;
+  color: var(--app-text);
   line-height: 1.6;
+  font-size: 14px;
 }

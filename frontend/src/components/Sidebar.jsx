@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import './Sidebar.css';
 
 export default function Sidebar({
@@ -6,11 +5,23 @@ export default function Sidebar({
   currentConversationId,
   onSelectConversation,
   onNewConversation,
+  onDeleteConversation,
+  theme,
+  onToggleTheme,
 }) {
   return (
     <div className="sidebar">
       <div className="sidebar-header">
-        <h1>LLM Council</h1>
+        <div className="sidebar-title-row">
+          <h1>Biais Detector Council</h1>
+          <button
+            type="button"
+            className="theme-toggle"
+            onClick={onToggleTheme}
+          >
+            {theme === 'dark' ? 'Light' : 'Dark'}
+          </button>
+        </div>
         <button className="new-conversation-btn" onClick={onNewConversation}>
           + New Conversation
         </button>
@@ -28,8 +39,23 @@ export default function Sidebar({
               }`}
               onClick={() => onSelectConversation(conv.id)}
             >
-              <div className="conversation-title">
-                {conv.title || 'New Conversation'}
+              <div className="conversation-title-row">
+                <div className="conversation-title">
+                  {conv.title || 'New Conversation'}
+                </div>
+                <div className="conversation-actions">
+                  <button
+                    type="button"
+                    className="delete-conv-btn"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onDeleteConversation(conv.id);
+                    }}
+                    aria-label="Delete conversation"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
               <div className="conversation-meta">
                 {conv.message_count} messages
