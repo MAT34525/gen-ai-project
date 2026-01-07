@@ -2,7 +2,7 @@
 
 from typing import List, Dict, Any, Tuple
 from openrouter import query_models_parallel, query_model
-from config import COUNCIL_BASE_MODELS
+from config import COUNCIL_BASE_MODELS, CATEGORIES_BIAIS_ESSENTIELS, PROMPT_PRE_INJECTION
 from models import Role, ModelType
 
 class Council() :
@@ -23,22 +23,33 @@ class Council() :
         assert self.chairman.model_role == Role.CHAIRMAN
 
     async def stage1_collect_responses(self, user_query: str) -> List[Dict[str, Any]]:
+    # On prépare les catégories pour l'injection si nécessaire
+    categories_str = ", ".join(CATEGORIES_BIAIS_ESSENTIELS.keys())
+    
+    # On utilise un message 'system' pour définir le comportement
+    messages = [
+        "role": "system", 
+            "content": PROMPT_PRE_INJECTION.format(categories=categories_str)
+        },
+        {
+            "role": "user", 
+            "content": f"Voici le texte à analyser : '{user_query}'"
+        }
+    ]
 
-        messages = [{"role": "user", "content": user_query}]
+    # Appel parallèle des modèles
+    responses = await query_models_parallel(self.models, messages)
 
-        # Query all models in parallel
-        responses = await query_models_parallel(self.models, messages)
+    # Formatage des résultats
+    stage1_results = []
+    for model, response in responses.items():
+        if response and 'content' in response:
+            stage1_results.append({
+                "model": model,
+                "response": response['content']
+            })
 
-        # Format results
-        stage1_results = []
-        for model, response in responses.items():
-            if response is not None:  # Only include successful responses
-                stage1_results.append({
-                    "model": model,
-                    "response": response.get('content', '')
-                })
-
-        return stage1_results
+    return stage1_results
 
 
     async def stage2_collect_rankings(
