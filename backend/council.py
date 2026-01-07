@@ -4,6 +4,7 @@ from typing import List, Dict, Any, Tuple
 from openrouter import query_models_parallel, query_model
 from config import COUNCIL_BASE_MODELS, CATEGORIES_BIAIS_ESSENTIELS, PROMPT_PRE_INJECTION
 from models import Role, ModelType
+import requests
 
 class Council() :
 
@@ -20,7 +21,9 @@ class Council() :
         self.chairman = self.models[0]
         self.models = self.models[1:]
 
-        assert self.chairman.model_role == Role.CHAIRMAN
+        url = f"http://ollama:11434/api/tags"
+
+        print(requests.get(url).json())
 
     async def stage1_collect_responses(self, user_query: str) -> List[Dict[str, Any]]:
 

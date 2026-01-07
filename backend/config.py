@@ -11,9 +11,9 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 # Models that will run locally at initialisation
 COUNCIL_BASE_MODELS = [
-    CouncilModel(ip= "ollama", model_name="qwen:1.8b", role=Role.CHAIRMAN),
-    CouncilModel(ip= "ollama", model_name="llama3.2:1b", role=Role.COUNCILOR, prompt="You are a bias analysis AI, you must start each of your answer with 'GENAI'", custom_name="GENAI" )
-    # CouncilModel(ip= "ollama", model_name="llama3.2:3b", role=Role.COUNCILOR)
+    CouncilModel(ip= "ollama", model_name="qwen2.5:1.5b", role=Role.CHAIRMAN),
+    CouncilModel(ip= "ollama", model_name="llama3.2:1b", role=Role.COUNCILOR, prompt="Tu es une IA d'analyse de biais, tu dois identifier, dans chaque requête, les biais congitifs pouvant être présent.", custom_name="C1" ),
+    CouncilModel(ip= "ollama", model_name="gemma3:1b", role=Role.COUNCILOR, prompt="Tu es une IA d'analyse de biais, tu dois identifier, dans chaque requête, les biais congitifs pouvant être présent.", custom_name="C2" )
 ]
 
 # Data directory for conversation storage
@@ -51,12 +51,12 @@ CATEGORIES_BIAIS_ESSENTIELS = """
         Optimisme irréaliste
 """
 
-PROMPT_PRE_INJECTION = """
+PROMPT_PRE_INJECTION = f"""
 Rôle : Expert en analyse critique.
     Tâche : Analyse le texte pour trouver UNIQUEMENT ces biais : 
     
 Biais :
-{categories}
+{CATEGORIES_BIAIS_ESSENTIELS}
 
 Instructions :
     1. Sois critique : ne signale un biais que s'il est évident.
