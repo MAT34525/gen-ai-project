@@ -51,3 +51,22 @@ CATEGORIES_BIAIS_ESSENTIELS = {
         "Optimisme irréaliste"
     ]
 }
+
+
+PROMPT_PRE_INJECTION = """
+Rôle : Expert en analyse critique.
+    Tâche : Analyse le texte pour trouver UNIQUEMENT ces biais : {categories}.
+
+Instructions :
+    1. Sois critique : ne signale un biais que s'il est évident.
+    2. Réponds au format strict.
+    
+Format attendu :
+    biais_trouves : 
+        "nom": "Nom du biais exact",
+        "citation": "La phrase du texte concernée",
+        "explication": "Pourquoi c'est un biais en 1 phrase",
+        "gravité": "Faible/Moyen/Élevé" (en prenant en compte si le biais est utilisé de manière positive/négative)
+
+Texte : "{texte}"
+"""
