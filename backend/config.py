@@ -20,42 +20,43 @@ COUNCIL_BASE_MODELS = [
 DATA_DIR = "data/conversations"
 
 # Liste des biais cognitif étudiés et recherchés
-CATEGORIES_BIAIS_ESSENTIELS = {
-    "Logique & Information": [
-        "Biais de confirmation (ne retient que ce qui l'arrange)",
-        "Biais de cadrage (présentation trompeuse)", 
-        "Généralisation hâtive",
-        "Faux dilemme (blanc ou noir)",
-        "Pente savonneuse (exagération des conséquences)",
-        "Biais d'ancrage (focalisation sur le premier chiffre/idée)"
-    ],
-    "Influence Sociale & Autorité": [
-        "Preuve sociale (tout le monde le fait)",
-        "Argument d'autorité (c'est vrai car le chef le dit)",
-        "Effet de halo (jugement global basé sur une qualité)",
-        "Biais in-group/out-group (nous vs eux)",
-        "Attaque Ad Hominem (attaque la personne, pas l'idée)"
-    ],
-    "Émotion & Manipulation": [
-        "Appel à la peur",
-        "Appel à l'émotion",
-        "Biais de négativité",
-        "Effet de victime identifiée",
-        "Culpabilisation"
-    ],
-    "Décision & Argent": [
-        "Biais des coûts irrécupérables (on a trop investi pour arrêter)",
-        "Aversion à la perte",
-        "Biais de statu quo (peur du changement)",
-        "Effet de rareté (vite, il n'en reste plus !)",
-        "Optimisme irréaliste"
-    ]
-}
-
+CATEGORIES_BIAIS_ESSENTIELS = """
+    Logique & Information: 
+        Biais de confirmation (ne retient que ce qui l'arrange),
+        Biais de cadrage (présentation trompeuse), 
+        Généralisation hâtive,
+        Faux dilemme (blanc ou noir),
+        Pente savonneuse (exagération des conséquences),
+        Biais d'ancrage (focalisation sur le premier chiffre/idée)
+    
+    Influence Sociale & Autorité: 
+        Preuve sociale (tout le monde le fait),
+        Argument d'autorité (c'est vrai car le chef le dit),
+        Effet de halo (jugement global basé sur une qualité),
+        Biais in-group/out-group (nous vs eux),
+        Attaque Ad Hominem (attaque la personne, pas l'idée)
+    
+    Émotion & Manipulation: 
+        Appel à la peur,
+        Appel à l'émotion,
+        Biais de négativité,
+        Effet de victime identifiée,
+        Culpabilisation
+    
+    Décision & Argent: 
+        Biais des coûts irrécupérables (on a trop investi pour arrêter),
+        Aversion à la perte,
+        Biais de statu quo (peur du changement),
+        Effet de rareté (vite, il n'en reste plus !),
+        Optimisme irréaliste
+"""
 
 PROMPT_PRE_INJECTION = """
 Rôle : Expert en analyse critique.
-    Tâche : Analyse le texte pour trouver UNIQUEMENT ces biais : {categories}.
+    Tâche : Analyse le texte pour trouver UNIQUEMENT ces biais : 
+    
+Biais :
+{categories}
 
 Instructions :
     1. Sois critique : ne signale un biais que s'il est évident.
