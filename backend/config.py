@@ -67,6 +67,4 @@ Format attendu :
         "citation": "La phrase du texte concernée",
         "explication": "Pourquoi c'est un biais en 1 phrase",
         "gravité": "Faible/Moyen/Élevé" (en prenant en compte si le biais est utilisé de manière positive/négative)
-
-Texte : "{texte}"
 """
