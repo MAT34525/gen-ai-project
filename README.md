@@ -2,12 +2,30 @@
 
 ## Changelog
 
-- [ ] Remove OpenRouter
-- [ ] Run local LLM
-    - [ ] Create an usable, scalable REST API
-    - [ ] Move to containerisation to run multiple instances
-    - [ ] Move to Ollama
-- [ ] 3 pane interface
+- [x] Remove OpenRouter ✅
+- [x] Run local LLM ✅
+    - [x] Create an usable, scalable REST API ✅
+    - [x] Move to containerisation to run multiple instances ✅
+    - [x] Move to Ollama ✅
+- [x] 2-PC distributed architecture ✅
+- [x] Comprehensive documentation ✅
+
+## 🎉 Project Status: READY FOR DEPLOYMENT
+
+This project has been successfully refactored to use **Ollama** for local LLM execution with a **distributed 2-PC architecture**.
+
+### What's New:
+✅ OpenRouter completely removed  
+✅ All LLMs run locally via Ollama  
+✅ REST API for distributed communication  
+✅ Docker Compose for easy deployment  
+✅ Separate Chairman (PC1) and Council (PC2) setup  
+✅ Comprehensive deployment documentation  
+
+### Quick Start:
+See **[README_NEW.md](README_NEW.md)** for complete setup instructions and **[DEPLOYMENT.md](DEPLOYMENT.md)** for detailed deployment guide.
+
+---
 
 ## Project Overview
 This final project is inspired by Andrej Karpathy’s **LLM Council** concept: instead of relying on a single Large Language Model (LLM), multiple LLMs collaborate by answering, reviewing, and synthesizing responses to a user query.

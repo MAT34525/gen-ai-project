@@ -56,10 +56,17 @@ function App() {
     try {
       const newConv = await api.createConversation();
       setConversations([
-        { id: newConv.id, created_at: newConv.created_at, message_count: 0 },
+        { id: newConv.id, created_at: newConv.created_at, title: newConv.title, message_count: 0 },
         ...conversations,
       ]);
       setCurrentConversationId(newConv.id);
+      // Set the conversation immediately so the chat interface appears
+      setCurrentConversation({
+        id: newConv.id,
+        created_at: newConv.created_at,
+        title: newConv.title,
+        messages: []
+      });
     } catch (error) {
       console.error('Failed to create conversation:', error);
     }

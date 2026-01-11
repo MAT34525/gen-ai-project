@@ -6,14 +6,54 @@ from models import CouncilModel, Role
 
 load_dotenv()
 
-# OpenRouter API key
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+# ============================================================================
+# DISTRIBUTED ARCHITECTURE CONFIGURATION (2-PC Setup)
+# ============================================================================
+# PC1: Chairman LLM (synthesis only)
+# PC2: Council LLMs (multiple models for initial responses and peer review)
+#
+# Configure the IPs below or use environment variables:
+# - CHAIRMAN_IP: IP address of PC running the Chairman LLM
+# - COUNCIL_IP: IP address of PC running the Council LLMs
+# ============================================================================
 
-# Models that will run locally at initialisation
+# Chairman configuration (runs on PC1)
+CHAIRMAN_IP = os.getenv("CHAIRMAN_IP", "localhost")  # PC1 IP
+CHAIRMAN_PORT = int(os.getenv("CHAIRMAN_PORT", "11434"))
+CHAIRMAN_MODEL = os.getenv("CHAIRMAN_MODEL", "qwen2.5:1.5b")
+
+# Council configuration (runs on PC2)
+COUNCIL_IP = os.getenv("COUNCIL_IP", "localhost")  # PC2 IP
+COUNCIL_PORT = int(os.getenv("COUNCIL_PORT", "11434"))
+
+# Models that will run locally at initialization
 COUNCIL_BASE_MODELS = [
-    CouncilModel(ip= "ollama", model_name="qwen2.5:1.5b", role=Role.CHAIRMAN),
-    CouncilModel(ip= "ollama", model_name="llama3.2:1b", role=Role.COUNCILOR, prompt="Tu es une IA d'analyse de biais, tu dois identifier, dans chaque requête, les biais congitifs pouvant être présent.", custom_name="C1" ),
-    CouncilModel(ip= "ollama", model_name="gemma3:1b", role=Role.COUNCILOR, prompt="Tu es une IA d'analyse de biais, tu dois identifier, dans chaque requête, les biais congitifs pouvant être présent.", custom_name="C2" )
+    # Chairman model (PC1)
+    CouncilModel(
+        ip=CHAIRMAN_IP,
+        port=CHAIRMAN_PORT,
+        model_name=CHAIRMAN_MODEL,
+        role=Role.CHAIRMAN
+    ),
+    # Council models (PC2) - using base models without custom prompts for now
+    CouncilModel(
+        ip=COUNCIL_IP,
+        port=COUNCIL_PORT,
+        model_name="llama3.2:1b",
+        role=Role.COUNCILOR
+    ),
+    CouncilModel(
+        ip=COUNCIL_IP,
+        port=COUNCIL_PORT,
+        model_name="gemma2:2b",
+        role=Role.COUNCILOR
+    ),
+    CouncilModel(
+        ip=COUNCIL_IP,
+        port=COUNCIL_PORT,
+        model_name="phi3:3.8b",
+        role=Role.COUNCILOR
+    )
 ]
 
 # Data directory for conversation storage

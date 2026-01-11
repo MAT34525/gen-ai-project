@@ -1,0 +1,35 @@
+# ============================================================================
+# PC2 Configuration (Council Ollama Only)
+# ============================================================================
+# This docker-compose file runs on PC2 and includes:
+# - Council Ollama instance with multiple models
+#
+# This instance will be accessed by the backend running on PC1
+# Make sure port 11434 is accessible from PC1
+# ============================================================================
+
+version: '3.8'
+
+services:
+  ollama-council:
+    image: ollama/ollama:latest
+    container_name: llm-council-ollama-council
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-council-data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    restart: unless-stopped
+    # GPU support (uncomment if using NVIDIA GPU)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+volumes:
+  ollama-council-data:
+    name: llm-council-ollama-council

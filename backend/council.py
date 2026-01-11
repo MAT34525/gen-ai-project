@@ -1,7 +1,7 @@
 """3-stage LLM Council orchestration."""
 
 from typing import List, Dict, Any, Tuple
-from openrouter import query_models_parallel, query_model
+from ollama import query_models_parallel, query_model, check_model_health
 from config import COUNCIL_BASE_MODELS, CATEGORIES_BIAIS_ESSENTIELS, PROMPT_PRE_INJECTION
 from models import Role, ModelType
 import requests
@@ -12,18 +12,19 @@ class Council() :
 
         self.models = COUNCIL_BASE_MODELS
 
-        for model in self.models:
-            model.pull()
-
-            if model.model_type == ModelType.CUSTOM :
-                model.create()
+        # Note: Skipping model.pull() at init - models should be pulled manually
+        # This prevents the backend from blocking on startup
+        # for model in self.models:
+        #     model.pull()
+        #     if model.model_type == ModelType.CUSTOM :
+        #         model.create()
         
         self.chairman = self.models[0]
         self.models = self.models[1:]
 
-        url = f"http://ollama:11434/api/tags"
-
-        print(requests.get(url).json())
+        # Removed startup health check to prevent blocking
+        # url = f"http://ollama:11434/api/tags"
+        # print(requests.get(url).json())
 
     async def stage1_collect_responses(self, user_query: str) -> List[Dict[str, Any]]:
 
