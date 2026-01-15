@@ -1,4 +1,4 @@
-"""Configuration for the LLM Council."""
+"""Configuration for the LLM Council, updated."""
 
 import os
 from dotenv import load_dotenv
