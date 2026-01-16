@@ -2,40 +2,24 @@
 
 from typing import List, Dict, Any, Tuple
 from ollama import query_models_parallel, query_model, check_model_health
-from config import COUNCIL_BASE_MODELS, CATEGORIES_BIAIS_ESSENTIELS, PROMPT_PRE_INJECTION
-from models import Role, ModelType
-import requests
+from config import COUNCIL_MODELS
 
 class Council() :
 
     def __init__(self) :
 
-        self.models = COUNCIL_BASE_MODELS
-
-        # Note: Skipping model.pull() at init - models should be pulled manually
-        # This prevents the backend from blocking on startup
-        # for model in self.models:
-        #     model.pull()
-        #     if model.model_type == ModelType.CUSTOM :
-        #         model.create()
+        self.models = COUNCIL_MODELS
         
         self.chairman = self.models[0]
         self.models = self.models[1:]
 
-        # Removed startup health check to prevent blocking
-        # url = f"http://ollama:11434/api/tags"
-        # print(requests.get(url).json())
-
     async def stage1_collect_responses(self, user_query: str) -> List[Dict[str, Any]]:
 
     # On utilise un message 'system' pour définir le comportement
-        messages = [{
-            "role": "system", 
-            "content": PROMPT_PRE_INJECTION
-            },
+        messages = [
             {
                 "role": "user", 
-                "content": f"Voici le texte à analyser : '{user_query}'"
+                "content": f"'{user_query}'"
             }
         ]
 
@@ -50,6 +34,7 @@ class Council() :
                     "model": model,
                     "response": response['content']
                 })
+
         return stage1_results
 
 
@@ -75,11 +60,9 @@ class Council() :
         ])
 
         ranking_prompt = f"""Rôle: Juge impartial
-    Tu dois évaluer les différentes réponses des modèles d'IA pour la détection des biais cognitif dans une phrase :
+    Tu dois évaluer les différentes réponses des modèles d'IA :
 
-    Phrase à analyser : {user_query}
-
-    Voici les réponses des différents modèles (anonymized):
+    Voici les réponses des différents modèles (anonymisés):
 
     {responses_text}
 
@@ -94,16 +77,14 @@ class Council() :
     - Chaque ligne doit contenir : un numéro, un point, un espace, puis UNIQUEMENT le libellé de la réponse (par exemple, « 1. Réponse A »).
     - N'ajoutez aucun autre texte ni explication dans la section du classement.
 
-    Exemple de format de réponses :
+    Exemple de format de réponses, tu peux en ajouter ou en retirer selon le nombre de réponses que tu as reçu :
 
     La réponse A fournit des détails pertinents sur X, mais omet Y…
     La réponse B est exacte, mais manque de profondeur sur Z…
-    La réponse C offre la réponse la plus complète…
-
+    
     FINAL RANKING:
     1. Réponse ...
     2. Réponse ...
-    3. Réponse ...
     
     Veuillez maintenant fournir votre évaluation et votre classement :"""
 

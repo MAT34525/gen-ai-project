@@ -53,14 +53,14 @@ async def query_model(
                 'reasoning_details': None
             }
         
-    except httpx.TimeoutException:
-        print(f"Timeout error when querying {model.model_name} at {model.ip}:{model.port}")
+    except httpx.TimeoutException as e:
+        print(f"Timeout error when querying {model.model_name} at {model.host} : {e}")
         return None
     except httpx.HTTPStatusError as e:
         print(f"HTTP error {e.response.status_code} when querying {model.model_name}: {e}")
         return None
     except Exception as e:
-        print(f"Error querying {model.model_name} at {model.ip}:{model.port}: {e}")
+        print(f"Error querying {model.model_name} at {model.host}: {e}")
         return None
 
 
@@ -102,7 +102,7 @@ async def check_model_health(model: CouncilModel) -> bool:
     """
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
-            url = f"http://{model.ip}:{model.port}/api/tags"
+            url = f"http://{model.host}/api/tags"
             response = await client.get(url)
             response.raise_for_status()
             
@@ -111,5 +111,5 @@ async def check_model_health(model: CouncilModel) -> bool:
             available_models = [m['name'] for m in data.get('models', [])]
             return model.model_name in available_models
     except Exception as e:
-        print(f"Health check failed for {model.model_name} at {model.ip}:{model.port}: {e}")
+        print(f"Health check failed for {model.model_name} at {model.host}: {e}")
         return False

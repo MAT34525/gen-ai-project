@@ -13,20 +13,6 @@ import storage
 from council import Council
 from models import CouncilModel
 
-council = Council()
-
-app = FastAPI(title="LLM Council API")
-
-# Enable CORS for local development
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
 class CreateConversationRequest(BaseModel):
     """Request to create a new conversation."""
     pass
@@ -60,21 +46,21 @@ class LLMModel(BaseModel):
     model_role: int
 
 
+app = FastAPI(title="LLM Council API")
+
+# Enable CORS for local development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/")
 async def root():
     """Health check endpoint."""
     return {"status": "ok", "service": "LLM Council API"}
-
-@app.post("/api/register")
-async def register_model(llm_model: LLMModel):
-    """Add a new model to the council."""
-
-    council.models.append(CouncilModel(
-        llm_model.ip,
-        llm_model.port,
-        llm_model.model_name,
-        llm_model.model_role
-    ))
 
 @app.get("/api/conversations", response_model=List[ConversationMetadata])
 async def list_conversations():
@@ -230,5 +216,8 @@ async def send_message_stream(conversation_id: str, request: SendMessageRequest)
 
 
 if __name__ == "__main__":
+
+    council = Council()
+    
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)
