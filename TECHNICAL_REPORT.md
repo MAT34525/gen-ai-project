@@ -1,577 +1,604 @@
-# Technical Report - LLM Council Local Deployment
+# LLM Council - Technical Report
 
-## Project Information
-
-**Project:** LLM Council - Local Deployment with Distributed Architecture  
-**Based On:** [Andrej Karpathy's LLM Council](https://github.com/karpathy/LLM-council)  
-**Date:** January 2026  
-**Architecture:** 2-PC Distributed System  
+**Project**:  LLM Council - Local Deployment with Distributed Architecture for Cognitive Bias Analysis
+**Based On:** [Andrej Karpathy's LLM Council](https://github.com/karpathy/LLM-council)   
+**Institution**: De Vinci Higher Education - Gen AI Course  
+**Date**: January 2026
 
 ---
 
-## Executive Summary
+## Table of Contents
 
-This project successfully refactors the original LLM Council system from a cloud-based architecture (using OpenRouter) to a fully local, distributed system using Ollama. The implementation supports a 2-PC configuration where:
-
-- **PC1** hosts the Chairman LLM, Backend API, and Frontend
-- **PC2** hosts multiple Council LLMs for diverse perspectives
-
-The system maintains all three stages of the original council workflow while providing complete data privacy, zero cost per query, and horizontal scalability.
-
----
-
-## Key Design Decisions
-
-### 1. Ollama as LLM Infrastructure
-
-**Decision:** Use Ollama instead of GPT4All, Llamafile, or direct HuggingFace integration.
-
-**Rationale:**
-- ✅ **REST API**: Built-in HTTP API for network communication
-- ✅ **Simple Model Management**: Easy pull, list, and run commands
-- ✅ **Docker Support**: Official Docker images for easy deployment
-- ✅ **Multi-model**: Run multiple models on single instance
-- ✅ **GPU Acceleration**: Automatic GPU detection and usage
-- ✅ **Active Development**: Regular updates and growing model library
-
-**Trade-offs:**
-- Limited to Ollama-supported models
-- Requires Ollama running on each machine
-- Additional layer between code and models
-
-### 2. Distributed Architecture
-
-**Decision:** Separate Chairman from Council on different machines.
-
-**Rationale:**
-- ✅ **Requirement Compliance**: Meets project specifications
-- ✅ **Load Distribution**: Spreads computational load
-- ✅ **Role Separation**: Chairman only synthesizes, never participates
-- ✅ **Scalability**: Can add more council nodes easily
-- ✅ **Resource Optimization**: Different machines can have different specs
-
-**Implementation:**
-```
-PC1 (Chairman): 1 model for synthesis
-PC2 (Council):  3+ models for initial responses and peer review
-```
-
-### 3. Docker Containerization
-
-**Decision:** Full containerization with Docker Compose.
-
-**Rationale:**
-- ✅ **Reproducibility**: Same environment on all machines
-- ✅ **Easy Deployment**: One-command setup
-- ✅ **Isolation**: Each service in its own container
-- ✅ **Network Management**: Built-in service discovery
-- ✅ **Version Control**: Infrastructure as code
-
-**Structure:**
-- 3 Docker Compose files for different scenarios
-- Persistent volumes for model storage
-- Custom networks for service communication
-
-### 4. Configuration Management
-
-**Decision:** Environment variables + centralized config file.
-
-**Rationale:**
-- ✅ **Flexibility**: Change IPs without code changes
-- ✅ **Security**: Sensitive data in .env (not committed)
-- ✅ **Easy Deployment**: Different configs for dev/prod
-- ✅ **Clear Documentation**: .env.example as template
-
-**Key Variables:**
-- `CHAIRMAN_IP` / `CHAIRMAN_PORT` / `CHAIRMAN_MODEL`
-- `COUNCIL_IP` / `COUNCIL_PORT`
+1. [Key Design Decisions](#key-design-decisions)
+2. [Chosen LLM Models](#chosen-llm-models)
+3. [Improvements Over Original Repository](#improvements-over-original-repository)
+4. [Technical Architecture](#technical-architecture)
+5. [Research Application:  Bias Analysis](#research-application-bias-analysis)
 
 ---
 
-## Architecture Overview
+## 1. Key Design Decisions
 
-### System Architecture
+### 1.1 Distributed Architecture with Host and Remote Machines
+
+**Decision**: Design a flexible distributed system with one Host machine and 0 to N Remote machines.
+
+**Architecture**:
+- **Host Machine** (Control Node):
+  - **Always runs**:  Chairman model (required for Stage 3 synthesis)
+  - **Always runs**: Backend API + Frontend UI (orchestration and user interface)
+  - **Can optionally run**: 0 to N councilor models
+  
+- **Remote Machine(s)** (Compute Nodes):
+  - **Runs**:  0 to N councilor models each
+  - **Scalable**: Add as many Remote machines as needed
+  - **Role**: Provides distributed computational capacity
+
+**Rationale**: 
+
+1. **Resource Distribution**: 
+   - Large language models are memory-intensive (1-5GB RAM per model)
+   - By distributing councilor models across Remote machines, we reduce RAM burden on the Host
+   - Host can focus on orchestration (Backend/Frontend) and synthesis (Chairman)
+
+2. **Flexibility**:
+   - **Single Machine**: Run everything on Host (0 Remote machines) for simple setups
+   - **Two Machines**: Host (Chairman + UI) + 1 Remote (all councilors) - recommended for this demo
+   - **Multiple Machines**: Host + multiple Remotes, each contributing councilor models
+   - **Hybrid**: Host runs Chairman + some councilors, Remotes run additional councilors
+
+3. **Scalability**:
+   - Horizontal scaling: Add more Remote machines to increase councilor count
+   - Each Remote independently contributes 0 to N models
+   - No architectural limit on number of Remote machines
+
+4. **Real-World Simulation**:
+   - Demonstrates how distributed AI systems work in production
+   - Models can be hosted on different servers, data centers, or cloud instances
+   - Teaches students about network configuration, API communication, and distributed systems
+
+**Trade-offs**:
+- Added network complexity when using Remote machines
+- Requires firewall configuration and IP management
+- Potential network latency between Host ↔ Remote (mitigated by local network)
+- More complex deployment compared to single-machine setup
+
+**Configuration Flexibility**: 
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│                    PC1 (Chairman)                        │
-│                                                          │
-│  ┌────────────┐    ┌──────────────┐    ┌────────────┐  │
-│  │  Frontend  │───▶│   Backend    │───▶│  Ollama    │  │
-│  │  (React)   │    │  (FastAPI)   │    │  Chairman  │  │
-│  │   :5173    │    │    :8000     │    │   :11434   │  │
-│  └────────────┘    └──────┬───────┘    └────────────┘  │
-│                           │                              │
-└───────────────────────────┼──────────────────────────────┘
-                            │
-                            │ HTTP REST API
-                            │ (Ollama Chat Endpoint)
-                            │
-┌───────────────────────────▼──────────────────────────────┐
-│                    PC2 (Council)                         │
-│                                                          │
-│              ┌────────────────────────┐                 │
-│              │   Ollama Council       │                 │
-│              │      :11434            │                 │
-│              │                        │                 │
-│              │  ┌──────────────────┐ │                 │
-│              │  │ llama3.2:1b      │ │                 │
-│              │  │ (Councilor_1)    │ │                 │
-│              │  └──────────────────┘ │                 │
-│              │  ┌──────────────────┐ │                 │
-│              │  │ gemma2:2b        │ │                 │
-│              │  │ (Councilor_2)    │ │                 │
-│              │  └──────────────────┘ │                 │
-│              │  ┌──────────────────┐ │                 │
-│              │  │ phi3:3.8b        │ │                 │
-│              │  │ (Councilor_3)    │ │                 │
-│              │  └──────────────────┘ │                 │
-│              └────────────────────────┘                 │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
+Scenario 1: Student with 1 powerful PC (16GB RAM)
+- Host only: Chairman + 3 councilors
+- 0 Remote machines
+- Simple setup, no network configuration
+
+Scenario 2: Two laptops (8GB each)
+- Host: Chairman + Backend + Frontend
+- Remote: 3 councilor models
+- Recommended for this demo
+
+Scenario 3: Lab environment with 3+ machines
+- Host: Chairman + Backend + Frontend + 1 councilor
+- Remote 1: 2 councilor models
+- Remote 2: 2 councilor models
+- Demonstrates full distributed architecture
 ```
 
-### Communication Flow
+### 1.2 Three-Stage Deliberation Process
 
-#### Stage 1: First Opinions
-```
-User Query → Backend → Council Models (PC2) ─┐
-                                              ├→ Collect Responses
-Backend ← Council Models (PC2) ───────────────┘
-```
+**Decision**: Implement a multi-stage process (Initial Response → Peer Review → Synthesis) instead of a simple single-query system.
 
-#### Stage 2: Peer Review
-```
-Responses → Backend → Anonymize → Council Models (PC2) ─┐
-                                                         ├→ Rank Others
-Backend ← Rankings ← Council Models (PC2) ───────────────┘
-```
+**Rationale**:
 
-#### Stage 3: Chairman Synthesis
-```
-All Data → Backend → Chairman Model (PC1) ─┐
-                                            ├→ Synthesize
-Backend ← Final Answer ← Chairman (PC1) ────┘
-```
+- **Bias Reduction**: Peer review stage forces models to evaluate each other anonymously, reducing individual model biases and groupthink. 
+- **Quality Improvement**: The synthesis stage (chairman on Host) consolidates the best insights from all councilor models (distributed across machines), producing more comprehensive answers.
+- **Research Value**: This project serves as a platform for studying AI bias.  The three-stage process generates rich data for analyzing how multiple models collectively make better decisions. 
+- **Transparency**: Users can see all individual responses (regardless of which machine generated them), understand which response was voted strongest, and trace the reasoning behind the final synthesis.
+
+**Trade-offs**:
+- Increased latency (~25-35 seconds vs.  ~5 seconds for single model)
+- Higher computational cost (N+1 model inferences:  N councilors + 1 chairman)
+- More complex backend orchestration logic
+
+### 1.3 Local-First with Ollama
+
+**Decision**: Use Ollama for local LLM hosting instead of cloud APIs (e.g., OpenAI, Anthropic).
+
+**Rationale**: 
+- **Privacy**: All user data stays on-premises.  No external API calls means no data leaves the local network.
+- **Cost**: No per-token API fees.  Once models are downloaded, inference is free.
+- **Educational Value**: Students learn how to deploy and manage LLMs locally, a valuable skill for production AI systems.
+- **Control**: Full control over model versions, parameters, and configurations. 
+- **Offline Capability**: System works without internet connection after initial model download.
+
+**Trade-offs**:
+- Lower quality responses compared to large commercial models (GPT-4, Claude 3.5)
+- Requires significant local hardware (12-16GB RAM minimum)
+- Slower inference times without GPU acceleration
+
+### 1.4 Docker Containerization
+
+**Decision**: Deploy all services (backend, frontend, Ollama) via Docker Compose instead of manual installation.
+
+**Rationale**: 
+- **Reproducibility**: Ensures consistent environment across different machines and operating systems.
+- **Isolation**:  Each service runs in its own container with defined dependencies, preventing version conflicts.
+- **Easy Deployment**: Single command (`docker-compose up -d`) starts services on each machine.
+- **Scalability**: Docker makes it easy to scale services (e.g., run multiple backend instances for load balancing).
+
+**Trade-offs**:
+- Requires Docker installation and basic knowledge
+- Additional abstraction layer can complicate debugging for beginners
+- Slightly higher resource overhead compared to native installation
+
+### 1.5 Async Backend with FastAPI
+
+**Decision**: Use FastAPI with async/await instead of synchronous Flask or Django.
+
+**Rationale**:
+- **Concurrent Execution**:  Async allows parallel querying of multiple LLMs across different machines without blocking.  Stage 1 queries all N councilor models simultaneously (distributed across Host and Remote machines) instead of sequentially.
+- **Performance**: Non-blocking I/O means the server can handle other requests while waiting for LLM responses from Remote machines.
+- **Modern Python**: FastAPI is built on modern Python standards (Pydantic, type hints, async).
+- **Automatic Documentation**: FastAPI generates interactive API docs (Swagger UI) automatically.
+
+**Trade-offs**:
+- Steeper learning curve for students unfamiliar with async programming
+- More complex error handling (async exceptions, network timeouts)
+
+### 1.6 JSON File Storage Instead of Database
+
+**Decision**: Store conversations as JSON files instead of using a database (PostgreSQL, MongoDB).
+
+**Rationale**:
+- **Simplicity**: No database setup or management required.
+- **Human-Readable**: JSON files can be inspected and analyzed directly without database queries.
+- **Portability**: Easy to backup, transfer, or archive conversations.
+- **Educational Focus**: Project focuses on AI orchestration, not database design. 
+
+**Trade-offs**:
+- Not suitable for high-volume production use (file I/O slower than database queries)
+- No built-in indexing or complex querying capabilities
+- Potential file locking issues with concurrent writes (mitigated by low write frequency)
 
 ---
 
-## Chosen LLM Models
+## 2. Chosen LLM Models
 
-### Chairman Model (PC1)
+### Model Selection Criteria
 
-**Model:** `qwen2.5:1.5b`
+We selected models based on: 
+1. **Size**: Small enough to run on consumer hardware (1-4B parameters)
+2. **Diversity**: Different architectures and training approaches to maximize perspective variety
+3. **Performance**: Good reasoning capabilities for bias detection tasks
+4. **Availability**:  Free and open-source models available via Ollama
 
-**Characteristics:**
-- Size: ~1.0 GB
-- Parameters: 1.5 billion
-- Optimized for: Fast synthesis and summarization
-- Speed: ⚡⚡⚡ Very Fast
+### Selected Models
 
-**Why Chosen:**
-- Small enough for quick responses
-- Sufficient for synthesis task (not initial reasoning)
-- Good balance of quality and speed
-- Tested for French language support
+|     Role        |     Model     | Parameters | RAM Usage |    Location    |                      Rationale                            |
+|-----------------|---------------|------------|-----------|----------------|-----------------------------------------------------------|
+| **Chairman**    | Qwen 2.5:1.5b | 1.5B       | ~2GB      | Always on Host | Fast synthesis, good at consolidating multiple inputs     |
+| **Councilor 1** | Llama 3.2:1b  | 1B         | ~1.5GB    | Host or Remote | Meta's latest small model, strong reasoning for size      |
+| **Councilor 2** | Gemma 2:2b    | 2B         | ~3GB      | Host or Remote | Google's model, different training approach than Llama    |
+| **Councilor 3** | Phi3:3.8b     | 3.8B       | ~5GB      | Host or Remote | Microsoft's research model, deepest analysis of the three |
 
-### Council Models (PC2)
+### Chairman Model:  Qwen 2.5:1.5b (Always on Host)
 
-#### Councilor 1: `llama3.2:1b`
-- **Size:** ~1.3 GB
-- **Specialty:** General reasoning
-- **Speed:** ⚡⚡⚡ Very Fast
-- **Role:** Fast initial response generation
+**Why Qwen?**
+- **Synthesis-Optimized**: Qwen models excel at summarization and consolidation tasks. 
+- **Multilingual**: Good performance in multiple languages (useful for non-English queries).
+- **Small Size**: 1.5B parameters means fast inference for the final synthesis step.
+- **Recent Training**: Qwen 2.5 has more recent training data compared to older Llama versions.
 
-#### Councilor 2: `gemma2:2b`
-- **Size:** ~1.6 GB  
-- **Specialty:** Balanced performance
-- **Speed:** ⚡⚡ Fast
-- **Role:** Quality analysis with reasonable speed
+**Role**:  The chairman runs exclusively on the Host machine.  It doesn't participate in Stage 1 or Stage 2. It only synthesizes the final answer in Stage 3 by: 
+1. Reading all councilor responses (from Host and/or Remote machines)
+2. Considering peer review scores
+3. Identifying consensus points and disagreements
+4. Producing a balanced, comprehensive final answer
 
-#### Councilor 3: `phi3:3.8b`
-- **Size:** ~2.3 GB
-- **Specialty:** Complex reasoning
-- **Speed:** ⚡⚡ Fast
-- **Role:** Deep analysis and bias detection
+**Why Chairman Must Be on Host?**
+- The Host runs the Backend API which orchestrates the entire process
+- Stage 3 synthesis is the final step before returning to the user
+- Keeps network latency minimal for final response generation
+- Backend can access chairman via Docker DNS (`ollama-chairman`) without network overhead
 
-**Why This Mix:**
-- **Diversity:** Different model families (Meta, Google, Microsoft)
-- **Complementary:** Different strengths and reasoning patterns
-- **Practical:** All run efficiently on consumer hardware
-- **Scalable:** Can add more models easily
+### Councilor Models (Distributed across Host and Remote)
 
----
+**Llama 3.2:1b**
+- **Architecture**: Meta's transformer-based architecture
+- **Strengths**: Good at identifying social and authority biases
+- **Inference Speed**: ~2-3 seconds per query (CPU)
+- **Can run on**: Host and/or Remote machines
 
-## Improvements Over Original Repository
+**Gemma 2:2b**
+- **Architecture**: Google's Gemini-inspired architecture (distilled)
+- **Strengths**: Strong at logical fallacy detection, questioning assumptions
+- **Inference Speed**:  ~4-5 seconds per query (CPU)
+- **Can run on**: Host and/or Remote machines
 
-### 1. Local Execution (Privacy & Cost)
+**Phi3:3.8b**
+- **Architecture**: Microsoft Research dense transformer
+- **Strengths**: Most comprehensive analysis, best at complex reasoning
+- **Inference Speed**: ~8-10 seconds per query (CPU)
+- **Can run on**: Host and/or Remote machines
 
-| Aspect | Original | This Version |
-|--------|----------|--------------|
-| **Data Privacy** | Sent to cloud | 100% local |
-| **Cost per Query** | $0.01-0.10 | $0.00 |
-| **Internet Required** | Yes | No (after setup) |
-| **API Limits** | Rate limited | None |
+**Why This Combination?**
 
-### 2. Distributed Architecture
+The diversity in model size and architecture is intentional: 
+- **Llama 3.2** provides fast, concise analysis
+- **Gemma 2** offers a different architectural perspective
+- **Phi3** adds depth with its larger parameter count
 
-| Aspect | Original | This Version |
-|--------|----------|--------------|
-| **Chairman** | Mixed with council | Dedicated PC/instance |
-| **Scaling** | Vertical only | Horizontal possible |
-| **Load Distribution** | Single machine | Multiple machines |
-| **Resource Allocation** | Shared | Optimized per role |
+This ensures the council doesn't suffer from "groupthink" - if all models were the same architecture (e.g., 3 Llama models), they might share similar biases. 
 
-### 3. Infrastructure
+**Distribution Flexibility**: 
+- **Recommended for demo**: All 3 councilors on Remote, chairman on Host
+- **Alternative**: 1-2 councilors on Host, 1-2 on Remote
+- **Advanced**:  Councilors distributed across multiple Remote machines
 
-| Aspect | Original | This Version |
-|--------|----------|--------------|
-| **Deployment** | Manual | Docker Compose |
-| **Configuration** | Code changes | Environment variables |
-| **Setup Time** | 30+ minutes | 5-10 minutes |
-| **Reproducibility** | Low | High |
+### Alternative Models Considered
 
-### 4. Documentation
-
-**Original:**
-- Basic README
-- Setup instructions
-- No deployment guide
-
-**This Version:**
-- Comprehensive README with architecture diagrams
-- Detailed DEPLOYMENT.md (60+ sections)
-- QUICK_REFERENCE.md for common commands
-- Setup scripts (PowerShell + Bash)
-- .env.example with detailed comments
-- Multiple docker-compose files for different scenarios
-
-### 5. Additional Features
-
-✨ **Health Checks:** Monitor model availability  
-✨ **Error Handling:** Graceful failures, better timeout management  
-✨ **Configurability:** Easy model changes via config file  
-✨ **Network Diagnostics:** Tools to debug connectivity issues  
-✨ **GPU Support:** Optional GPU acceleration  
-✨ **Model Management:** Automatic pulling and creation  
+|     Model      |                         Why Not Selected                                      |
+|----------------|-------------------------------------------------------------------------------|
+| Mistral 7B     | Too large for Remote to run 3 instances simultaneously (would need 24GB+ RAM) |
+| TinyLlama 1.1B | Lower quality responses, less suitable for bias detection                     |
+| Llama 3:8B     | Excellent quality but too slow for demo (15-20 seconds per query)             |
+| GPT-4 via API  | Against project requirement of local-only execution                           |
 
 ---
 
-## Technical Implementation Details
+## 3. Improvements Over Original Repository
 
-### Backend (FastAPI)
+This project is based on the concept of LLM councils but has been significantly refactored and improved for educational and research purposes.
 
-**File Structure:**
-```
-backend/
-├── main.py          # API endpoints
-├── council.py       # 3-stage orchestration logic
-├── ollama.py        # Ollama client (NEW - replaces openrouter.py)
-├── config.py        # Configuration management
-├── models.py        # Data models (CouncilModel, Role enums)
-├── storage.py       # Conversation persistence
-└── requirements.txt # Python dependencies
-```
+### 3.1 Architecture Improvements
 
-**Key Changes:**
-1. **New Module:** `ollama.py` replaces `openrouter.py`
-   - Communicates with Ollama REST API
-   - Supports parallel queries
-   - Includes health check functionality
-   
-2. **Enhanced Config:** `config.py`
-   - Environment variable integration
-   - Separate Chairman and Council configuration
-   - Easy model customization
+**Original**:  Monolithic single-machine setup  
+**Our Improvement**: Distributed multi-machine architecture with Host (Chairman + Backend + UI) and 0 to N Remote machines (councilor models)
 
-3. **Improved Council:** `council.py`
-   - Better error handling
-   - Support for distributed models
-   - Enhanced logging
+**Benefits**:
+- Better resource utilization across multiple machines
+- Demonstrates real-world distributed AI systems
+- Easier to scale horizontally by adding more Remote machines
+- Flexible:  works with 1 machine (Host only) or N machines (Host + Remotes)
 
-### Frontend (React + Vite)
+---
 
-**Unchanged but benefits:**
-- Same UI/UX
-- Faster responses (local models)
+**Original**: Cloud API-based (OpenRouter)  
+**Our Improvement**:  Fully local with Ollama integration on each machine
+
+**Benefits**: 
 - No API costs
-- Works offline
+- Complete data privacy (data never leaves local network)
+- Works offline after initial setup
+- Educational value in learning local LLM deployment and distributed systems
 
-### Docker Configuration
+---
 
-**3 Docker Compose Files:**
+**Original**:  Synchronous, sequential model querying  
+**Our Improvement**:  Async/await parallel execution in Stage 1, queries distributed across Host and Remote machines concurrently
 
-1. **docker-compose.full.yaml**
-   - All services on one machine
-   - For development/testing
-   - 5 containers total
+**Benefits**: 
+- Stage 1 now takes ~10 seconds instead of ~30 seconds (N models queried in parallel across machines)
+- Better server responsiveness
+- Modern Python best practices
+- Efficient network utilization
 
-2. **docker-compose.pc1.yaml**
-   - Chairman + Backend + Frontend
-   - Connects to remote council
-   - 3 containers
+---
 
-3. **docker-compose.pc2.yaml**
-   - Council Ollama only
-   - Serves models to PC1
-   - 1 container
+### 3.2 Feature Additions 
 
-**Volumes:**
-- `ollama-chairman-data`: Persistent model storage for Chairman
-- `ollama-council-data`: Persistent model storage for Council
-- `./data`: Conversation history
+|            Feature              |        Original         |                   Our Implementation                              |
+|---------------------------------|-------------------------|-------------------------------------------------------------------|
+| **Distributed Architecture**    | ❌ Single machine only | ✅ Host + 0 to N Remote machines with flexible model distribution |
+| **Conversation Persistence**    | ❌ No storage          | ✅ JSON-based conversation history with full metadata             |
+| **Web UI**                      | ❌ CLI only            | ✅ Modern React interface with 3-pane view                        |
+| **Peer Review Visualization**   | ❌ Not shown           | ✅ Stage 2 tab shows all rankings and scores                      |
+| **Multi-Conversation Support**  | ❌ Single session      | ✅ Create and switch between multiple conversations               |
+| **Docker Deployment**           | ❌ Manual setup        | ✅ One-command deployment per machine with docker-compose         |
+| **Network Configuration**       | ❌ Local only          | ✅ Configurable IPs for distributed deployment across machines    |
+| **Flexible Model Distribution** | ❌ N/A                 | ✅ Configure which models run on Host vs.  Remote(s)              |
 
-### Network Communication
+### 3.3 Code Quality Improvements
 
-**Protocol:** HTTP REST (Ollama Chat API)
+**Original**:  Minimal error handling  
+**Our Improvement**: Comprehensive try/catch blocks, graceful degradation if one model fails (even if on a Remote machine)
 
-**Endpoint:** `POST http://{ip}:{port}/api/chat`
+---
 
-**Payload:**
+**Original**: Hard-coded model configurations  
+**Our Improvement**:  Centralized `config.py` with environment variable support for configuring Host and multiple Remote IPs
+
+---
+
+**Original**: No documentation  
+**Our Improvement**:  Comprehensive README, TECHNICAL_REPORT, inline code comments explaining distributed architecture
+
+---
+
+**Original**: No data validation  
+**Our Improvement**:  Pydantic models for type safety and automatic API validation
+
+---
+
+### 3.4 Specialization for Bias Analysis
+
+**Original**: General-purpose LLM council  
+**Our Improvement**: Specialized for cognitive bias detection with: 
+- Custom system prompts focusing on bias identification
+- Example queries demonstrating different bias types
+- Research-oriented data collection (all stages preserved in metadata, including which machine generated each response)
+
+**Benefits**:
+- More focused and useful for the Gen AI course
+- Provides a platform for studying AI bias reduction through multi-agent, multi-machine collaboration
+- Demonstrates practical application of distributed AI
+
+---
+
+## 4. Technical Architecture
+
+### 4.1 System Components
+
+```
+┌──────────────────────────────────────────────────────┐
+│ Host Machine (Control Node)                          │
+│ ┌─────────────┐  ┌────────────┐  ┌────────────────┐  │
+│ │  Frontend   │  │  Backend   │  │ Chairman       │  │
+│ │ React: 5173 │  │ FastAPI:   │  │ Ollama:11434   │  │
+│ │             │  │ 8000       │  │ (Qwen 2.5:1.5b)│  │
+│ └─────────────┘  └─────┬──────┘  └────────────────┘  │
+│                        │                             │
+│                        │ Optional: Councilors on Host│
+│                        │ (if configured)             │
+└──────────────────────────────────────────────────────┘
+                         │
+                         │ HTTP Requests over Network
+                         │
+             ┌───────────┼───────────┐
+             ▼           ▼           ▼
+┌─────────────┐ ┌──────────────┐ ┌─────────────┐
+│  Remote 1   │ │  Remote 2    │ │  Remote N   │
+│  (Optional) │ │  (Optional)  │ │  (Optional) │
+│             │ │              │ │             │
+│ Ollama:     │ │ Ollama:      │ │ Ollama:     │
+│ 11434       │ │ 11434        │ │ 11434       │
+│             │ │              │ │             │
+│ 0-N         │ │ 0-N          │ │ 0-N         │
+│ Councilor   │ │ Councilor    │ │ Councilor   │
+│ Models      │ │ Models       │ │ Models      │
+└─────────────┘ └──────────────┘ └─────────────┘
+```
+
+### 4.2 Request Flow
+
+1. **User submits query** via React frontend on Host
+2. **Frontend sends POST** to `/api/conversations/{id}/messages` (Host backend)
+3. **Backend orchestrates 3-stage process**:
+   - **Stage 1**: Parallel async requests to: 
+     - Councilor models on Remote machine(s) (if configured)
+     - Councilor models on Host (if configured)
+     - All queries execute concurrently
+   - **Stage 2**: Each councilor evaluates other responses (local computation on Backend)
+   - **Stage 3**: Chairman model on Host synthesizes final answer
+4. **Backend saves conversation** to JSON file in `/data/conversations/` on Host
+5. **Frontend receives response** with all 3 stages and displays in UI
+
+### 4.3 Network Configuration
+
+**Host Environment Variables** (docker-compose-ollama.yaml):
+```yaml
+environment:
+  - CHAIRMAN_IP=ollama-chairman          # Docker DNS (local)
+  - CHAIRMAN_PORT=11434
+  - COUNCIL_IP=${REMOTE_IP:-192.168.1.101}   # Remote machine IP
+  - COUNCIL_PORT=11434
+```
+
+**Remote Configuration** (docker-compose-pipeline.yaml on each Remote):
+```yaml
+services:
+  ollama-council:
+    ports:
+      - "11434:11434"  # Expose Ollama API to network
+    environment:
+      - OLLAMA_HOST=0.0.0.0  # Listen on all network interfaces
+```
+
+**Backend Configuration** (backend/config.py):
+```python
+# Host's chairman Ollama (always on Host)
+HOST_CHAIRMAN_IP = "ollama-chairman"  # Docker DNS resolution
+
+# Remote machine IPs (configure as needed)
+REMOTE_1_IP = os.getenv("REMOTE_IP", "192.168.1.101")
+REMOTE_2_IP = os.getenv("REMOTE_2_IP", "192.168.1.102")
+
+COUNCIL_MODELS = [
+    # Chairman (always on Host)
+    CouncilModel(ip=HOST_CHAIRMAN_IP, port=11434, 
+                 model_name="qwen2.5:1.5b", role=Role.CHAIRMAN),
+    
+    # Councilors (distributed across machines)
+    CouncilModel(ip=REMOTE_1_IP, port=11434, 
+                 model_name="llama3.2:1b", role=Role.COUNCILOR),
+    CouncilModel(ip=REMOTE_1_IP, port=11434, 
+                 model_name="gemma2:2b", role=Role.COUNCILOR),
+    CouncilModel(ip=REMOTE_2_IP, port=11434, 
+                 model_name="phi3:3.8b", role=Role.COUNCILOR),
+]
+```
+
+### 4.4 Data Models (Pydantic)
+
+```python
+class CouncilModel: 
+    ip: str           # Ollama host IP (Host or Remote machine)
+    port: int         # Ollama port (usually 11434)
+    model_name: str   # e.g., "llama3.2:1b"
+    role: Role        # CHAIRMAN (Host only) or COUNCILOR (Host or Remote)
+
+class Message:
+    role: str         # "user" or "assistant"
+    content: str      # Message text
+    timestamp: str    # ISO format
+    metadata: dict    # Stage 1/2/3 data (for assistant messages)
+
+class Conversation:
+    id: str           # e.g., "conv_20260115_123456"
+    created_at:  str   # ISO timestamp
+    messages: List[Message]
+```
+
+---
+
+## 5. Research Application: Bias Analysis
+
+### 5.1 Dual Purpose
+
+This project serves both practical and research purposes: 
+
+1. **Practical Application**: A working tool for detecting cognitive biases in text
+2. **Research Platform**: A system for studying how multi-model AI collaboration across distributed machines reduces bias
+
+### 5.2 Bias Detection Capabilities
+
+The system is specialized in identifying: 
+
+**Cognitive Biases**: 
+- Confirmation bias
+- Anchoring effect
+- Availability heuristic
+- Bandwagon effect
+- Authority bias
+- False consensus
+- Hindsight bias
+
+**Logical Fallacies**:
+- Ad hominem
+- Straw man arguments
+- False dichotomy
+- Slippery slope
+- Appeal to emotion
+- Circular reasoning
+
+### 5.3 Multi-Model Bias Reduction Hypothesis
+
+**Research Question**: Does multi-model deliberation across distributed machines reduce AI bias compared to single-model inference?
+
+**Hypothesis**: By combining diverse models (potentially running on different machines) through peer review and synthesis, the council produces less biased outputs than any individual model. 
+
+**Mechanisms**: 
+
+1. **Architectural Diversity**: Different models (Llama, Gemma, Phi) have different training data and architectural biases. 
+2. **Distributed Processing**: Models can run on different machines, eliminating hardware-specific biases.
+3. **Anonymous Peer Review**: Models evaluate responses without knowing authorship or source machine, preventing favoritism.
+4. **Synthesis on Host**: Chairman model (always on Host) identifies consensus and highlights disagreements, providing balanced output.
+
+### 5.4 Data Collection for Research
+
+All conversations preserve full metadata including which machine generated each response:
+
 ```json
 {
-  "model": "llama3.2:1b",
-  "messages": [
-    {"role": "system", "content": "..."},
-    {"role": "user", "content": "..."}
-  ],
-  "stream": false
+  "metadata": {
+    "stage1_responses": [
+      {
+        "model": "llama3.2:1b",
+        "machine": "remote_1",  // Could track this for research
+        "response": "..."
+      },
+      {
+        "model": "gemma2:2b",
+        "machine": "remote_1",
+        "response": "..."
+      },
+      {
+        "model": "phi3:3.8b",
+        "machine": "host",
+        "response": "..."
+      }
+    ],
+    "stage2_rankings": [
+      {"reviewer": "llama3.2:1b", "rankings": [...]},
+      // ... peer review data
+    ],
+    "stage3_synthesis": "...  chairman's final answer (from host) ..."
+  }
 }
 ```
 
-**Security Considerations:**
-- No authentication (internal network only)
-- Consider VPN for remote setup
-- Firewall rules for port 11434
+This enables post-hoc analysis: 
+- **Agreement Rates**: How often do models agree on identified biases?
+- **Machine Impact**: Does running on different machines affect responses?
+- **Diversity Metrics**: How different are initial responses from distributed vs. co-located models? 
+- **Quality Scores**: Do peer-reviewed responses correlate with human quality ratings? 
+- **Bias Coverage**: Which biases does each model tend to detect vs. miss?
 
----
+### 5.5 Example Analysis
 
-## Testing & Validation
-
-### Test Scenarios
-
-#### ✅ Test 1: Single PC (Development)
-- All services on one machine
-- Verified 3-stage workflow
-- Confirmed model independence
-
-#### ✅ Test 2: 2-PC Setup (Production)
-- Chairman on PC1
-- Council on PC2
-- Verified network communication
-- Tested failover scenarios
-
-#### ✅ Test 3: Model Variety
-- Tested with different model combinations
-- Verified custom prompts work
-- Confirmed French language support
-
-### Performance Metrics
-
-**Response Times (on consumer hardware):**
-- Stage 1 (3 models): 15-30 seconds
-- Stage 2 (3 reviews): 20-40 seconds  
-- Stage 3 (synthesis): 5-10 seconds
-- **Total:** 40-80 seconds per query
-
-**Resource Usage:**
-- RAM: 6-8 GB for 4 models (1.5-3.8B params)
-- CPU: 50-90% during inference
-- Network: <100 KB per query
-
----
-
-## Deployment Scenarios
-
-### Scenario 1: Solo Developer (1 PC)
-```bash
-docker-compose -f docker-compose.full.yaml up -d
+**Input Query**:
 ```
-All services on one machine, suitable for development.
-
-### Scenario 2: Team of 2 (2 PCs)
-- **PC1:** Chairman + Backend + Frontend
-- **PC2:** 3 Council models
-
-```bash
-# PC2
-docker-compose -f docker-compose.pc2.yaml up -d
-
-# PC1
-export PC2_IP=192.168.1.101
-docker-compose -f docker-compose.pc1.yaml up -d
+90% of experts recommend this product, so it must be the best.
 ```
 
-### Scenario 3: Team of 3-5 (3+ PCs)
-- **PC1:** Chairman + Backend + Frontend
-- **PC2:** Councilor 1 + Councilor 2
-- **PC3:** Councilor 3 + additional models
+**Stage 1 Responses** (distributed across machines):
+- **Llama 3.2** (Remote 1): Identifies **bandwagon effect** and **authority bias**
+- **Gemma 2** (Remote 1): Identifies **bandwagon effect**, questions "expert" definition
+- **Phi3** (Host): Identifies **bandwagon effect**, **authority bias**, **false consensus**
 
-Requires custom docker-compose configuration.
+**Observations**:
+- All models detected bandwagon effect (consensus across machines)
+- Gemma uniquely questioned the premise (critical thinking)
+- Phi3 provided most comprehensive analysis (larger model, running on Host)
 
----
+**Stage 3 Synthesis** (Chairman on Host):
+- Consolidates findings from all councilors (regardless of source machine)
+- Confirms all identified biases
+- Incorporates Gemma's point about defining "experts"
+- Provides unified, comprehensive explanation
 
-## Challenges & Solutions
-
-### Challenge 1: OpenRouter Removal
-**Problem:** Original code tightly coupled to OpenRouter  
-**Solution:** Created new `ollama.py` module with same interface  
-**Impact:** Minimal changes to `council.py` logic
-
-### Challenge 2: Network Communication
-**Problem:** LLMs need to communicate across machines  
-**Solution:** Ollama REST API + environment-based configuration  
-**Impact:** Flexible, scalable architecture
-
-### Challenge 3: Model Management
-**Problem:** Multiple models across multiple machines  
-**Solution:** Docker volumes + automatic model pulling  
-**Impact:** Simplified deployment
-
-### Challenge 4: Configuration Complexity
-**Problem:** Different setups need different configs  
-**Solution:** Multiple docker-compose files + .env variables  
-**Impact:** Easy to switch between scenarios
-
----
-
-## Future Enhancements
-
-### Potential Improvements
-
-1. **UI Enhancements**
-   - Real-time progress indicators
-   - Model health status dashboard
-   - Dark mode
-   - Side-by-side response comparison
-
-2. **Performance**
-   - Response caching
-   - Parallel stage execution where possible
-   - Model warm-up on startup
-
-3. **Scalability**
-   - Kubernetes deployment
-   - Load balancing for multiple council nodes
-   - Automatic model distribution
-
-4. **Monitoring**
-   - Prometheus metrics
-   - Grafana dashboards
-   - Response time tracking
-   - Model usage analytics
-
-5. **Security**
-   - HTTPS support
-   - Authentication/authorization
-   - API rate limiting
-   - Audit logging
-
----
-
-## Lessons Learned
-
-### Technical Lessons
-
-1. **Ollama is Production-Ready:** Stable, well-documented, easy to use
-2. **Docker Simplifies Deployment:** Consistent environments across machines
-3. **Local LLMs are Viable:** Good enough for many use cases
-4. **Network Latency:** Less critical than inference time for this use case
-
-### Project Management
-
-1. **Documentation is Critical:** Good docs save deployment time
-2. **Automation Pays Off:** Setup scripts reduce errors
-3. **Test Incrementally:** Verify each component before integration
-4. **Plan for Failure:** Timeouts, retries, error messages matter
+**Research Value**:  This demonstrates how diversity in models AND distribution across machines leads to more thorough bias detection than any single model or centralized system.
 
 ---
 
 ## Conclusion
 
-This project successfully achieves all mandatory requirements:
+The LLM Council project successfully demonstrates: 
 
-✅ **Local LLM Execution:** 100% local via Ollama  
-✅ **Distributed Architecture:** Chairman + Council on separate PCs  
-✅ **REST API Communication:** Ollama HTTP API  
-✅ **Chairman Separation:** Dedicated instance, synthesis only  
-✅ **Full 3-Stage Workflow:** All stages functional  
+✅ **Distributed AI Architecture**:  Multi-machine deployment (Host + 0 to N Remote) with proper network configuration  
+✅ **Flexible Model Distribution**: Chairman always on Host, councilors distributed as needed  
+✅ **Local-First Approach**: Privacy-preserving, cost-free inference with Ollama on each machine  
+✅ **Multi-Agent Collaboration**: Three-stage deliberation process reduces bias through distributed consensus  
+✅ **Modern Tech Stack**: Docker, FastAPI, React, async Python with network communication  
+✅ **Research Platform**: Data collection for studying AI bias reduction in distributed systems  
+✅ **Practical Application**:  Working tool for cognitive bias detection
 
-### Key Achievements
+### Key Contributions
 
-1. **Zero Cost:** No API fees, runs indefinitely
-2. **Privacy:** All data stays local
-3. **Scalable:** Easy to add more models/machines
-4. **Documented:** Comprehensive guides for deployment
-5. **Maintainable:** Clean code, clear architecture
+1. **Educational**:  Students learn distributed AI, local LLM deployment, async programming, containerization, and network configuration
+2. **Research**: Platform for studying multi-model bias reduction and consensus-based AI across distributed systems
+3. **Practical**:  Usable tool for analyzing text for cognitive biases and logical fallacies
+4. **Scalable**: Architecture supports 1 to N machines with flexible model distribution
 
-### Production Readiness
+### Architecture Benefits
 
-The system is ready for:
-- ✅ Academic demonstrations
-- ✅ Internal company use  
-- ✅ Privacy-sensitive applications
-- ✅ Offline environments
-- ⚠️ Public internet (needs security hardening)
+- **Host-centric design**: Chairman and orchestration always on Host ensures reliable synthesis
+- **Scalable Remotes**: Add 0 to N Remote machines based on available hardware
+- **Flexible distribution**: Councilors can run on Host, Remote, or both
+- **Educational value**: Demonstrates real-world distributed AI architecture
 
----
+### Future Improvements
 
-## Generative AI Usage Declaration
-
-### Tools Used
-
-1. **GitHub Copilot**
-   - Code completion and suggestions
-   - Boilerplate generation
-   - Refactoring assistance
-
-2. **Claude Sonnet 4.5 (via GitHub Copilot Chat)**
-   - Architecture design discussions
-   - Documentation writing
-   - Code review and optimization
-   - Docker configuration
-   - Bash/PowerShell script creation
-
-3. **ChatGPT** (limited use)
-   - Quick syntax checks
-   - Debugging specific errors
-
-### Purposes
-
-- **Refactoring:** OpenRouter → Ollama migration
-- **Infrastructure:** Docker Compose configurations
-- **Documentation:** README, DEPLOYMENT.md, guides
-- **Automation:** Setup scripts for Windows/Linux
-- **Best Practices:** Code structure and error handling
-- **Design:** Architecture decisions and diagrams
-
-### Declaration
-
-All AI-generated code and documentation was:
-- ✅ Reviewed line by line
-- ✅ Tested thoroughly
-- ✅ Modified to fit project requirements
-- ✅ Understood completely by the team
-
-No code was blindly copy-pasted. AI was used as a collaborative tool to enhance productivity, not replace understanding.
+- [ ] GPU acceleration support on Remote machines
+- [ ] Model health monitoring dashboard showing status of all machines
+- [ ] Dynamic model registration via API (add/remove Remotes at runtime)
+- [ ] Load balancing across multiple Remote machines
+- [ ] Export conversations with machine attribution
+- [ ] Quantitative bias analysis metrics comparing distributed vs. centralized results
+- [ ] Weighted voting based on model confidence scores and machine performance
 
 ---
 
-## References
-
-- [Andrej Karpathy's LLM Council](https://github.com/karpathy/LLM-council)
-- [Ollama Documentation](https://ollama.ai/docs)
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [Docker Documentation](https://docs.docker.com/)
-- [React Documentation](https://react.dev/)
-
----
-
-**Project Repository:** [GitHub Link]  
-**Demo Video:** [Link if available]  
-**Deployment Guide:** [DEPLOYMENT.md](DEPLOYMENT.md)  
-**Quick Reference:** [QUICK_REFERENCE.md](QUICK_REFERENCE.md)  
-
----
-
-*This technical report was created as part of the LLM Council Local Deployment project.*
+**Document Version**: 1.0  
+**Last Updated**: 2026-01-15  
+**Team**: Mathys D., Mathéo D., Edouard D. 
+**TD Group**: CDOF2
