@@ -36,17 +36,20 @@ COUNCIL_BASE_MODELS = [
         role=Role.CHAIRMAN
     ),
     # Council models (PC2) - using base models without custom prompts for now
+
     CouncilModel(
         ip=COUNCIL_IP,
         port=COUNCIL_PORT,
         model_name="llama3.2:1b",
         role=Role.COUNCILOR
+
     ),
     CouncilModel(
         ip=COUNCIL_IP,
         port=COUNCIL_PORT,
         model_name="gemma2:2b",
         role=Role.COUNCILOR
+
     ),
     CouncilModel(
         ip=COUNCIL_IP,
