@@ -2,7 +2,7 @@
 
 from typing import List, Dict, Any, Tuple
 from ollama import query_models_parallel, query_model, check_model_health
-from config import COUNCIL_MODELS
+from config import COUNCIL_MODELS, PROMPT_INJECTION_STAGE_1, PROMPT_INJECTION_STAGE_3
 
 class Council() :
 
@@ -19,7 +19,7 @@ class Council() :
         messages = [
             {
                 "role": "user", 
-                "content": f"Répond à la demande : '{user_query}'. Reste synthétique, concis utilise des bullet points."
+                "content": f"Répond à la demande suivante, reste synthétique, concis utilise des bullet points :  {PROMPT_INJECTION_STAGE_1} '{user_query}'"
             }
         ]
 
@@ -141,6 +141,8 @@ class Council() :
     - Les réponses individuelles et les enseignements qu'elles apportent
     - Les classements par les pairs et ce qu'ils révèlent sur la qualité des réponses
     - Les éventuels points de convergence ou de divergence
+    
+    {PROMPT_INJECTION_STAGE_3}
     
     Fournir une réponse finale claire et bien argumentée qui représente la sagesse collective du conseil :"""
         

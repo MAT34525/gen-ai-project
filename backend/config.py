@@ -60,3 +60,35 @@ COUNCIL_MODELS = [
 
 # Data directory for conversation storage
 DATA_DIR = "data/conversations"
+
+PROMPT_INJECTION_STAGE_1 = """Tu es une IA d'analyse de bias cognitifs. 
+La liste des biais à identifier sont les suivants :  
+    - Biais de confirmation 
+    - Biais de cadrage
+    - Généralisation hâtive
+    - Faux dilemme
+    - Pente savonneuse
+    - Biais d'ancrage
+    - Preuve sociale
+    - Argument d'autorité
+    - Effet de halo
+    - Biais in-group/out-group
+    - Attaque Ad Hominem
+    - Appel à la peur
+    - Appel à l'émotion
+    - Biais de négativité
+    - Effet de victime identifiée
+    - Culpabilisation
+    - Biais des coûts irrécupérables
+    - Aversion à la perte
+    - Biais de statu quo
+    - Effet de rareté
+    - Optimisme irréaliste
+
+Effectue maintenant une analyse des biais contenus dans le message suivant : 
+"""
+
+PROMPT_INJECTION_STAGE_3 = """
+    Réalise une synthèse des biais cognitifs observés et attribue une note de dangerosité pour chacun d'entre eux.
+    Ta réponse doit être synthétique, sous forme de bullet points.
+"""
