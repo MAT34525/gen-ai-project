@@ -286,16 +286,16 @@ This project is based on the concept of LLM councils but has been significantly 
 
 ### 3.2 Feature Additions 
 
-|            Feature              |        Original         |                   Our Implementation                              |
-|---------------------------------|-------------------------|-------------------------------------------------------------------|
-| **Distributed Architecture**    | ❌ Single machine only | ✅ Host + 0 to N Remote machines with flexible model distribution |
-| **Conversation Persistence**    | ❌ No storage          | ✅ JSON-based conversation history with full metadata             |
-| **Web UI**                      | ❌ CLI only            | ✅ Modern React interface with 3-pane view                        |
-| **Peer Review Visualization**   | ❌ Not shown           | ✅ Stage 2 tab shows all rankings and scores                      |
-| **Multi-Conversation Support**  | ❌ Single session      | ✅ Create and switch between multiple conversations               |
-| **Docker Deployment**           | ❌ Manual setup        | ✅ One-command deployment per machine with docker-compose         |
-| **Network Configuration**       | ❌ Local only          | ✅ Configurable IPs for distributed deployment across machines    |
-| **Flexible Model Distribution** | ❌ N/A                 | ✅ Configure which models run on Host vs.  Remote(s)              |
+|            Feature              |      Original       |                   Our Implementation                           |
+|---------------------------------|---------------------|----------------------------------------------------------------|
+| **Distributed Architecture**    | Single machine only | Host + 0 to N Remote machines with flexible model distribution |
+| **Conversation Persistence**    | No storage          | JSON-based conversation history with full metadata             |
+| **Web UI**                      | CLI only            | Modern React interface with 3-pane view                        |
+| **Peer Review Visualization**   | Not shown           | Stage 2 tab shows all rankings and scores                      |
+| **Multi-Conversation Support**  | Single session      | Create and switch between multiple conversations               |
+| **Docker Deployment**           | Manual setup        | One-command deployment per machine with docker-compose         |
+| **Network Configuration**       | Local only          | Configurable IPs for distributed deployment across machines    |
+| **Flexible Model Distribution** | N/A                 | Configure which models run on Host vs.  Remote(s)              |
 
 ### 3.3 Code Quality Improvements
 
@@ -564,13 +564,13 @@ This enables post-hoc analysis:
 
 The LLM Council project successfully demonstrates: 
 
-✅ **Distributed AI Architecture**:  Multi-machine deployment (Host + 0 to N Remote) with proper network configuration  
-✅ **Flexible Model Distribution**: Chairman always on Host, councilors distributed as needed  
-✅ **Local-First Approach**: Privacy-preserving, cost-free inference with Ollama on each machine  
-✅ **Multi-Agent Collaboration**: Three-stage deliberation process reduces bias through distributed consensus  
-✅ **Modern Tech Stack**: Docker, FastAPI, React, async Python with network communication  
-✅ **Research Platform**: Data collection for studying AI bias reduction in distributed systems  
-✅ **Practical Application**:  Working tool for cognitive bias detection
+- **Distributed AI Architecture**:  Multi-machine deployment (Host + 0 to N Remote) with proper network configuration  
+- **Flexible Model Distribution**: Chairman always on Host, councilors distributed as needed  
+- **Local-First Approach**: Privacy-preserving, cost-free inference with Ollama on each machine  
+- **Multi-Agent Collaboration**: Three-stage deliberation process reduces bias through distributed consensus  
+- **Modern Tech Stack**: Docker, FastAPI, React, async Python with network communication  
+- **Research Platform**: Data collection for studying AI bias reduction in distributed systems  
+- **Practical Application**:  Working tool for cognitive bias detection
 
 ### Key Contributions
 
