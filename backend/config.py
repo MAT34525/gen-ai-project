@@ -39,7 +39,7 @@ COUNCIL_MODELS = [
     CouncilModel(
         ip="ollama", # Set the IP of a remote  PC with running ollama
         port=OLLAMA_PORT,
-        model_name="llama3.2:1b",
+        model_name="qwen3:0.6b",
         role=Role.COUNCILOR
 
     ),
@@ -53,7 +53,7 @@ COUNCIL_MODELS = [
     CouncilModel(
         ip="ollama", # Set the IP of a remote PC with running ollama
         port=OLLAMA_PORT,
-        model_name="phi3:3.8b",
+        model_name="qwen3:1.7b",
         role=Role.COUNCILOR
     )
 ]
