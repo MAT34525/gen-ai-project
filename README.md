@@ -1,3 +1,4 @@
+
 # LLM Council - Distributed Multi-Model AI System
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
@@ -6,31 +7,36 @@
 [![Docker](https://img.shields.io/badge/Docker-Compose-blue.svg)](https://www.docker.com/)
 [![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-orange.svg)](https://ollama.ai/)
 
----
+> **For detailed technical information**, see [TECHNICAL_REPORT.md](TECHNICAL_REPORT.md)
+
+## Acknowledgments
+
+**Inspired by:**
+- Andrej Karpathy's LLM Council concept
+- Multi-agent AI research (DeepMind, OpenAI, Anthropic)
+
+**Built with:**
+- [Ollama](https://ollama.ai/) - Local LLM infrastructure
+- [FastAPI](https://fastapi.tiangolo.com/) - Modern Python web framework
+- [React](https://react.dev/) - Frontend UI library
+- [Docker](https://www.docker.com/) - Containerization platform
 
 ## Team Information
 
-**Institution**: De Vinci Higher Education - Gen AI Course  
-**TD Group**: CDOF2 
-**Submission Date**: January 2026
+**Institution**: De Vinci Higher Education - Gen AI </br>
+**TD Group**: CDOF2 </br>
+**Submission Date**: January 2026 </br>
 
 **Team Members**:
-- Mathys D.,
-- Mathéo D.,
+- Mathys D.
+- Mathéo D.
 - Edouard D.
- 
----
 
 ## Project Overview
 
 The **LLM Council** is a fully local, distributed multi-agent AI system that replaces single-model inference with collaborative decision-making. Instead of querying one AI model, the system orchestrates multiple locally-running models through a **three-stage deliberation process** to provide comprehensive, bias-reduced responses.
 
-### Primary Use Cases
-
-1. **Cognitive Bias Detection**: Analyze text for logical fallacies and reasoning errors
-2. **Bias Analysis Research**: Study how multi-model collaboration reduces individual AI biases through peer review and consensus building
-
-### Key Features
+**Key Features**
 
 - **Fully Local Execution** - No cloud APIs, all models run on your infrastructure
 - **Distributed Architecture** - Designed to run across multiple machines via REST APIs
@@ -41,7 +47,7 @@ The **LLM Council** is a fully local, distributed multi-agent AI system that rep
 - **Conversation Storage** - Persistent JSON-based conversation history
 - **3-Pane Interface** - View all model responses, reviews, and final synthesis
 
-### Three-Stage Deliberation Process
+**Three-Stage Deliberation Process :**
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -65,98 +71,12 @@ The **LLM Council** is a fully local, distributed multi-agent AI system that rep
 └─────────────────────────────────────────────────────┘
 ```
 
-**Why This Approach?**
 
-- **Diverse Perspectives**: 3 different models with varying architectures and training  
-- **Bias Reduction**: Peer review process reduces individual model biases  
-- **Comprehensive Answers**:  Synthesis combines strengths of all models  
-- **Full Privacy**: All processing happens locally, no cloud APIs  
-- **Research Platform**: Study how multi-agent collaboration affects AI bias
+## Prerequisites
 
----
-
-## Architecture Overview
-
-### Host and Remote Configuration
-
-The LLM Council uses a flexible distributed architecture:
-
-**Host Machine** (Control Node):
-- **Always runs**: Chairman model (required for synthesis)
-- **Always runs**: Backend API + Frontend UI
-- **Can optionally run**: 0 to N councilor models
-- **Role**: Orchestrates the entire council, runs the web interface
-
-**Remote Machine(s)** (Compute Nodes):
-- **Runs**: 0 to N councilor models each
-- **Role**: Provides additional computational capacity for councilor models
-- **Scalability**: Add as many remote machines as needed
-
-**Example Configurations**: 
-
-```
-Configuration 1: Single Machine (Host Only)
-┌─────────────────────────────────────────────────┐
-│ Host Machine                                    │
-│ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌──────────┐│
-│ │Frontend │ │ Backend │ │Chairman │ │3 Council ││
-│ │         │ │         │ │  Model  │ │ Models   ││
-│ └─────────┘ └─────────┘ └─────────┘ └──────────┘│
-└─────────────────────────────────────────────────┘
-Requirements:  16GB+ RAM
-
-Configuration 2: Two Machines (Recommended for this demo)
-┌─────────────────────────────────────────────────┐
-│ Host Machine                                    │
-│       ┌─────────┐ ┌─────────┐ ┌─────────┐       │
-│       │Frontend │ │ Backend │ │Chairman │       │
-│       │         │ │         │ │  Model  │       │
-│       └─────────┘ └─────────┘ └─────────┘       │
-└────────────────────┬────────────────────────────┘
-                     │ Network Connection
-                     ▼
-┌─────────────────────────────────────────────────┐
-│ Remote Machine                                  │
-│ ┌───────────────────────────────────────────┐   │
-│ │   3 Councilor Models                      │   │
-│ │   (Llama, Gemma, Phi3)                    │   │
-│ └───────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────┘
-Requirements: Host 4GB RAM, Remote 12GB RAM
-
-Configuration 3: Multiple Remotes (Advanced)
-┌─────────────────────────────────────────────────┐
-│ Host Machine                                    │
-│ Frontend + Backend + Chairman + 1 Councilor     │
-└──────────┬──────────────────┬───────────────────┘
-           │                  │
-    ┌──────▼──────┐    ┌──────▼───────┐
-    │  Remote 1   │    │   Remote 2   │
-    │ 2 Councilors│    │ 1 Councilor  │
-    └─────────────┘    └──────────────┘
-Total: 1 Chairman + 4 Councilors distributed across 3 machines
-```
-
-**Key Points**: 
-- The **Host** always includes the Chairman model (required for Stage 3 synthesis)
-- The **Host** can run 0 to N councilor models in addition to the Chairman
-- Each **Remote** machine can run 0 to N councilor models
-- You can have 0 to N Remote machines
-- Total councilor count = (Councilors on Host) + (Councilors on Remote 1) + (Councilors on Remote 2) + ...
-
----
-
-## Setup and Installation Instructions
-
-### Prerequisites
-
-- **1 Host machine** (required)
-- **0-N Remote machines** (optional, for distributed setup)
-- **Docker & Docker Compose** installed on all machines
-- **8GB+ RAM** on Host (for Chairman + Backend + Frontend)
-- **4GB+ RAM per councilor model** on Remote machines
-- **20GB free disk space** for models and data
-- **Local network connectivity** between machines (if using Remote)
+- **1 Host** : required, run front-end, backend and ollama instance with chairman and 0+ councilor models
+- **0-N Remote** : optional, run ollama instance with 0+ councilor models
+- **Local network connectivity** between machines (if using remote ollama instances)
 
 **System Requirements:**
 
@@ -169,193 +89,185 @@ Total: 1 Chairman + 4 Councilors distributed across 3 machines
 | **Network**      | 100Mbps LAN                         | Gigabit LAN      |
 | **OS**           | Windows 10, Ubuntu 20.04, macOS 12+ | Latest versions  |
 
-### Installation Steps
+Also, you can allow Docker to use GPU, with the appropriate NVIDIA driver, see [ollama online instructions](https://docs.ollama.com/docker). __This has not been tested on our project.__
 
-#### Step 1: Install Docker
+## Project Structure
 
-**Windows:**
-1. Download [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
-2. Install and restart your PC
-3. Enable WSL 2 if prompted
-
-**Linux (Ubuntu/Debian):**
-```bash
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
-sudo usermod -aG docker $USER
+```
+gen-ai-project/
+│
+├── backend/                     # Python, FastAPI backend, configure LLM models & connections
+│
+├── frontend/                    # JavaScript, React web interface for user
+│
+├── docker-compose-ollama.yaml   # Host setup (front, back & ollama)
+├── docker-compose-pipeline.yaml # Remote setup (ollama)
+│
+├── README.md                    # This file
+└── TECHNICAL_REPORT.md          # Technical documentation
 ```
 
-**macOS:**
-1. Download [Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/)
-2. Install and start Docker Desktop
 
-#### Step 2: Get Remote Machine IP Address (if using distributed setup)
+## Setup & Install
 
-On **each Remote machine**, open PowerShell/Terminal: 
+> **[H]** : Host configuration <br>
+> **[R]** : Remote configuration
 
-```bash
-# Windows
-ipconfig
+### 1. **[H/R]** Install Docker & Docker compose
 
-# Linux/Mac
-ip addr
-```
+- Install Docker : [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- Install Docker compose : [Docker Compose](https://docs.docker.com/compose/install)
+
+### 2. **[R]** Get network adresses for host configuration
 
 Look for the **IPv4 Address** - something like `192.168.1.101` or `10.0.0.X`
 
-#### Step 3: Set Up Remote Machine(s) (Optional - skip if running on Host only)
-
-On **each Remote machine**, clone the repository and start services:
-
-```bash
-git clone <your-repository-url>
-cd gen-ai-project
-
-# Start the Remote Ollama instance
-docker-compose -f docker-compose-pipeline.yaml up -d
+- Windows :
+```ps
+ipconfig
 ```
 
-Wait 2-3 minutes for Ollama to start, then pull the councilor models you want on this Remote: 
+- Linux / Mac : 
 
 ```bash
-# Pull all 3 councilor models (recommended)
-docker exec llm-council-ollama-council ollama pull llama3.2:1b
-docker exec llm-council-ollama-council ollama pull gemma2:2b
-docker exec llm-council-ollama-council ollama pull phi3:3.8b
-
-# Or pull only specific models
-docker exec llm-council-ollama-council ollama pull llama3.2:1b
+ip addr
 ```
+### 3. **[H/R]** Clone the project
 
-**This takes 5-10 minutes** depending on your internet speed. 
-
-**Verify Remote is ready:**
+On **each machine**, clone the repository with :
 
 ```bash
-docker exec llm-council-ollama-council ollama list
-```
-
-You should see the models you pulled.  
-
-**Configure Firewall:**
-
-**Windows:**
-```powershell
-New-NetFirewallRule -DisplayName "Ollama LLM Council" `
-  -Direction Inbound `
-  -LocalPort 11434 `
-  -Protocol TCP `
-  -Action Allow
-```
-
-**Linux:**
-```bash
-sudo ufw allow 11434/tcp
-sudo ufw reload
-```
-
-#### Step 4: Set Up Host Machine
-
-On **Host machine**, clone the repository: 
-
-```bash
-git clone <your-repository-url>
+git clone git@github.com:MAT34525/gen-ai-project.git
 cd gen-ai-project
 ```
 
-**Configure Remote machine IP(s)** (skip if not using Remote):
+### 4. **[R]** Run remote ollama
 
-**Option A: Create . env file** (recommended)
-```bash
-# For single Remote
-echo "REMOTE_IP=192.168.1.101" > .env
-
-# For multiple Remotes, edit config.py instead (see Configuration section)
-```
-
-**Option B: Edit docker-compose-ollama.yaml**
-```yaml
-# Line 28 - Change REMOTE_IP to your actual Remote IP
-- COUNCIL_IP=${REMOTE_IP:-192.168.1.101}  # ← Update this IP
-```
-
-Start Host services:
+Start ollama on remote machines with : 
 
 ```bash
-docker-compose -f docker-compose-ollama.yaml up -d
+docker compose -f docker-compose-ollama.yaml up -d
 ```
 
-Pull the chairman model:
+> [!IMPORTANT]  
+> If models are not explicitely pulled, it will be done at the start of the host.</br>
+> Yet,  the web UI will be unresponsive until all models are pulled.
+
+> [!TIP]
+> You can pull models prior to their usage to speed up the process using : 
+>
+> ```bash
+> docker exec llm-council-ollama ollama pull llama3.2:1b
+> ```
+
+> [!TIP]
+> You can checked available models using : 
+>
+> ```bash
+> docker exec llm-council-ollama ollama list
+> ```
+
+### 5. **[H]** Configure the host
+
+The host configuration is accessible in the `backend/config.py` folder.
+
+> [!IMPORTANT]  
+> The ip `ollama`reffers to the name of the container running locally, it is not an external IP.</br>
+> Change `ollama` to a valid IP if the models runs on an other machine.
+
+
+> [!TIP]  
+> You can check available models names at : [ollama library](https://ollama.com/)
+> **Exemple of models** (pull with `ollama pull <model-name>`):
+> - Small (1-2B): `tinyllama:1.1b`, `qwen2:1.5b`, `gemma:2b`
+> - Medium (7B): `llama3:7b`, `mistral:7b`, `qwen2:7b`
+> - Large (13B+): `llama3:13b`, `mixtral:8x7b`
+
+Complete settings in the file, you can add or remove models with :
+```py
+CouncilModel(
+   ip=<ip>, # Host container : "ollama", Remote : valid IP, ex : "10.0.0.X"
+   port=OLLAMA_PORT, # Default is 11434, change if required
+   model_name=<model name>, # See ollama library, ex : "llama3.2:1b"
+   role=<role> # Role.CHAIRMAN, Role.COUNCILOR
+)
+```
+
+Add your models and connections setting in the `COUNCIL_MODELS` list :
+```py
+COUNCIL_MODELS = [
+
+    # Chairman model (host only)
+    CouncilModel(
+        ip="ollama", # Local ollama container (resolved with docker dns)
+        port=OLLAMA_PORT,
+        model_name="llama3.2:1b",
+        role=Role.CHAIRMAN
+    ),
+
+    # Council models (remote or host)
+    CouncilModel(
+        ip="ollama", # Set the IP of a remote  PC with running ollama
+        port=OLLAMA_PORT,
+        model_name="llama3.2:1b",
+        role=Role.COUNCILOR
+
+    ),
+    CouncilModel(
+        ip="ollama", # Set the IP of a remote PC with running ollama
+        port=OLLAMA_PORT,
+        model_name="gemma3:1b",
+        role=Role.COUNCILOR
+
+    ),
+    CouncilModel(
+        ip="ollama", # Set the IP of a remote PC with running ollama
+        port=OLLAMA_PORT,
+        model_name="phi3:3.8b",
+        role=Role.COUNCILOR
+    )
+]
+```
+
+### 6. **[H]** Run the host
+
+Once configured, you can run host containers with :
 
 ```bash
-docker exec llm-council-ollama-chairman ollama pull qwen2.5:1. 5b
+docker compose -f docker-compose-pipeline.yaml up -d
 ```
 
-**Takes 2-3 minutes**
+Once loaded, you will have access to : 
+- Web UI at : http://localhost:5173
+- Backend REST API at : localhost:8001
+- Ollama API at : localhost:11434
 
-**Optional: Pull councilor models on Host** (if you want some councilors on Host):
+> [!IMPORTANT]  
+> If models are not explicitely pulled, it will be done at the start of the host.</br>
+> Yet,  the web UI will be unresponsive until all models are pulled.
+
+### 7. **[H/R]** Check connectivity
+
+All ollama instances should be accessible on the network.
+
+You can check access to remote ollama containers using : 
 
 ```bash
-# Pull councilors on Host
-docker exec llm-council-ollama-chairman ollama pull llama3.2:1b
-docker exec llm-council-ollama-chairman ollama pull gemma2:2b
+curl http://<IP>:11434/api/tags
 ```
-
-Then edit `backend/config.py` to configure which councilors run on Host vs.  Remote (see Configuration section).
-
-#### Step 5: Test Connection Between Machines (if using Remote)
-
-From **Host machine**, verify it can reach each Remote's Ollama: 
-
-```bash
-# Replace 192.168.1.101 with your actual Remote IP
-curl http://192.168.1.101:11434/api/tags
-```
+> **IP** : IP of the remote host on the network.
 
 **Success**:  You should see JSON output listing Remote's models  
 **Failure**: Check firewall rules and network connectivity
 
-#### Step 6: Verify Installation
+## Demo
 
-On **Host machine**, open your web browser and navigate to:
-
-```
-http://localhost:5173
-```
-
-You should see the LLM Council web interface!  🎉
-
----
-
-## Instructions to Run the Demo
-
-### Access the Application
-
-1. Ensure Host services are running:
-   ```bash
-   # Check on Host
-   docker ps
-   ```
-
-2. If using Remote machine(s), ensure they are running:
-   ```bash
-   # Check on each Remote
-   docker ps
-   ```
-
-3. Open a web browser on **Host** and navigate to:
-   ```
-   http://localhost:5173
-   ```
-
-### Demo Workflow
-
-#### 1. Create a New Conversation
+### 1. Create a New Conversation
 
 - Click **"+ New Conversation"** in the left sidebar
 - A new conversation appears with a timestamp ID
 
-#### 2. Submit a Test Query
+### 2. Submit a Test Query
 
 Try this example query that demonstrates cognitive bias detection:
 
@@ -366,27 +278,24 @@ This product is used by 90% of experts, so it must be the best option available.
 Or try this one: 
 
 ```
-Everyone in my social circle agrees with this political view, 
-so it must be objectively correct.
+Everyone in my social circle agrees with this political view, so it must be objectively correct.
 ```
 
 - Type or paste the query in the text input area
 - Click **"Send"** or press `Ctrl+Enter`
-- Wait 25-35 seconds for the council to deliberate
+- Wait until the council to deliberate
 
-#### 3. Observe Multiple Machines Working Together (if using Remote)
+### 3. Wait for response
 
-**On Remote machine(s)** (watch the console logs):
+On each machine(s), you can monitor progress of ollama :
+
 ```bash
-# View councilor models processing
 docker logs -f llm-council-ollama-council
 ```
 
-You'll see the councilor models (Llama, Gemma, Phi3) processing the query in parallel.
+Or backend responses on the host and ongoing API calls: 
 
-**On Host machine** (watch the backend logs):
 ```bash
-# View orchestration and chairman synthesis
 docker logs -f llm-council-backend
 ```
 
@@ -395,7 +304,7 @@ You'll see:
 - Stage 2: Peer review calculations
 - Stage 3: Chairman model synthesis (always on Host)
 
-#### 4. Review Council Responses
+### 4. Review Council Responses
 
 The UI will display three tabs: 
 
@@ -416,304 +325,37 @@ The UI will display three tabs:
 - Most comprehensive and balanced response
 - References points from multiple models
 
-#### 5. Demonstrate Multiple Queries
-
-To show the full system capabilities, try queries covering different bias types:
-
-**Bandwagon Effect:**
-```
-Most people are buying this cryptocurrency, so it's definitely a safe investment.
-```
-
-**Authority Bias:**
-```
-A famous celebrity endorsed this health supplement, so it must work.
-```
-
-**Confirmation Bias:**
-```
-I only read news sources that confirm my existing beliefs because they're the most accurate.
-```
-
-**False Dichotomy:**
-```
-You're either with us or against us - there's no middle ground on this issue.
-```
-
-#### 6. Show Conversation History
+### 5. Show Conversation History
 
 - Click on previous conversations in the sidebar
 - All messages and metadata are preserved
 - Demonstrates persistent storage capability
 
-### Expected Demo Outcome
-
-During the live demo, you should showcase: 
-
-**Distributed Architecture**: 
-   - If using Remote:  Show councilor models on Remote, chairman on Host
-   - If single machine:  Explain how it can scale to multiple machines
-
-**Council Responses**:  All 3 stages visible in the interface  
-**Review Stage**: Models evaluating each other's responses  
-**Chairman Final Answer**: Synthesized, comprehensive response (always from Host)  
-**Bias Detection**: Clear identification of cognitive biases in test statements
-
-### Demo Troubleshooting
-
-**If models are slow:**
-- This is expected for CPU-only inference
-- 25-35 seconds is normal for the full 3-stage process
-- Mention GPU acceleration would reduce to 10-15 seconds
-
-**If connection fails (distributed setup):**
-- Verify all machines are on same network
-- Check firewall rules on Remote machines
-- Test with:  `curl http://<REMOTE_IP>:11434/api/tags`
-
-**If a model fails:**
-- System will continue with remaining models
-- Graceful degradation is built-in
-- Check logs:  `docker logs llm-council-backend`
-
----
-
-## Configuration
-
-### Project Structure
-
-```
-gen-ai-project/
-├── backend/                      # FastAPI backend
-│   ├── __init__.py              # Package initializer
-│   ├── config.py                # Model configuration
-│   ├── council.py               # 3-stage orchestration logic
-│   ├── dockerfile               # Backend container
-│   ├── main.py                  # API server & endpoints
-│   ├── models.py                # Data models (Pydantic)
-│   ├── ollama.py                # Ollama API client
-│   ├── requirements.txt         # Python dependencies
-│   └── storage.py               # Conversation persistence 
-│
-├── frontend/                    # React UI
-│   ├── src/
-│   │   ├── api.js               # Backend API client
-│   │   ├── App.css              # Application styles
-│   │   ├── App.jsx              # Main application
-│   │   ├── index.css            # Global styles
-│   │   ├── main.jsx             # React entry point
-│   │   ├── assets/              # Static assets (images, icons)
-│   │   └── components/
-│   │       ├── ChatInterface.css    # Chat UI styles
-│   │       ├── ChatInterface.jsx    # Chat UI orchestrator
-│   │       ├── Sidebar.css          # Sidebar styles
-│   │       ├── Sidebar.jsx          # Conversation list
-│   │       ├── Stage1.css           # Stage 1 styles
-│   │       ├── Stage1.jsx           # Display initial responses
-│   │       ├── Stage2.css           # Stage 2 styles
-│   │       ├── Stage2.jsx           # Show peer reviews
-│   │       ├── Stage3.css           # Stage 3 styles
-│   │       └── Stage3.jsx           # Present synthesis
-│   ├── dockerfile               # Frontend container
-│   ├── eslint.config.js         # ESLint configuration
-│   ├── index.html               # HTML entry point
-│   ├── package.json             # Node dependencies
-│   ├── README.md                # Frontend documentation
-│   └── vite.config.js           # Vite build config
-│
-├── docker-compose-ollama.yaml   # Host services (Chairman + Backend + UI)
-├── docker-compose-pipeline.yaml # Remote services (Councilor models)
-├── main.py                      # Root Python script
-├── README.md                    # This file
-└── TECHNICAL_REPORT.md          # Technical documentation
-```
-
-### Customizing Model Distribution (Host vs.  Remote)
-
-Edit `backend/config.py` to configure which models run where:
-
-```python
-import os
-
-# Host's chairman Ollama (always on Host)
-HOST_CHAIRMAN_IP = "ollama-chairman"
-
-# Remote machine IPs (if using distributed setup)
-REMOTE_1_IP = os.getenv("REMOTE_IP", "192.168.1.101")
-REMOTE_2_IP = os.getenv("REMOTE_2_IP", "192.168.1.102")  # Optional second Remote
-
-COUNCIL_MODELS = [
-    # ============================================
-    # CHAIRMAN (Always on Host - Required)
-    # ============================================
-    CouncilModel(
-        ip=HOST_CHAIRMAN_IP,
-        port=11434,
-        model_name="qwen2.5:1.5b",
-        role=Role.CHAIRMAN
-    ),
-    
-    # ============================================
-    # COUNCILORS (Distributed across machines)
-    # ============================================
-    
-    # Councilors on Remote 1
-    CouncilModel(
-        ip=REMOTE_1_IP,
-        port=11434,
-        model_name="llama3.2:1b",
-        role=Role.COUNCILOR
-    ),
-    CouncilModel(
-        ip=REMOTE_1_IP,
-        port=11434,
-        model_name="gemma2:2b",
-        role=Role.COUNCILOR
-    ),
-    CouncilModel(
-        ip=REMOTE_1_IP,
-        port=11434,
-        model_name="phi3:3.8b",
-        role=Role.COUNCILOR
-    ),
-    
-    # Optional:  Councilors on Remote 2
-    # CouncilModel(
-    #     ip=REMOTE_2_IP,
-    #     port=11434,
-    #     model_name="mistral:7b",
-    #     role=Role.COUNCILOR
-    # ),
-    
-    # Optional: Councilors on Host (same machine as Chairman)
-    # CouncilModel(
-    #     ip=HOST_CHAIRMAN_IP,  # Same Ollama instance as Chairman
-    #     port=11434,
-    #     model_name="tinyllama:1.1b",
-    #     role=Role.COUNCILOR
-    # ),
-]
-```
-
-**Configuration Examples:**
-
-**Example 1: All on Host (Single Machine)**
-```python
-COUNCIL_MODELS = [
-    # Chairman on Host
-    CouncilModel(ip="ollama-chairman", model_name="qwen2.5:1.5b", role=Role.CHAIRMAN),
-    
-    # All councilors also on Host
-    CouncilModel(ip="ollama-chairman", model_name="llama3.2:1b", role=Role.COUNCILOR),
-    CouncilModel(ip="ollama-chairman", model_name="gemma2:2b", role=Role.COUNCILOR),
-    CouncilModel(ip="ollama-chairman", model_name="phi3:3.8b", role=Role.COUNCILOR),
-]
-```
-
-**Example 2: Host + Single Remote (Recommended for demo)**
-```python
-COUNCIL_MODELS = [
-    # Chairman on Host
-    CouncilModel(ip="ollama-chairman", model_name="qwen2.5:1.5b", role=Role.CHAIRMAN),
-    
-    # All councilors on Remote
-    CouncilModel(ip="192.168.1.101", model_name="llama3.2:1b", role=Role.COUNCILOR),
-    CouncilModel(ip="192.168.1.101", model_name="gemma2:2b", role=Role.COUNCILOR),
-    CouncilModel(ip="192.168.1.101", model_name="phi3:3.8b", role=Role.COUNCILOR),
-]
-```
-
-**Example 3: Host + Multiple Remotes**
-```python
-COUNCIL_MODELS = [
-    # Chairman on Host
-    CouncilModel(ip="ollama-chairman", model_name="qwen2.5:1.5b", role=Role.CHAIRMAN),
-    
-    # 1 councilor on Host
-    CouncilModel(ip="ollama-chairman", model_name="tinyllama:1.1b", role=Role.COUNCILOR),
-    
-    # 2 councilors on Remote 1
-    CouncilModel(ip="192.168.1.101", model_name="llama3.2:1b", role=Role.COUNCILOR),
-    CouncilModel(ip="192.168.1.101", model_name="gemma2:2b", role=Role.COUNCILOR),
-    
-    # 1 councilor on Remote 2
-    CouncilModel(ip="192.168.1.102", model_name="phi3:3.8b", role=Role.COUNCILOR),
-]
-```
-
-### Available Models
-
-**Available models** (pull with `ollama pull <model-name>`):
-- Small (1-2B): `tinyllama:1.1b`, `qwen2:1.5b`, `gemma:2b`
-- Medium (7B): `llama3:7b`, `mistral:7b`, `qwen2:7b`
-- Large (13B+): `llama3:13b`, `mixtral:8x7b`
-
-### Network Configuration
-
-Update environment variables in `.env` file:
-
-```bash
-# Remote Machine Network Configuration
-REMOTE_IP=192.168.1.101           # Primary Remote machine
-REMOTE_2_IP=192.168.1.102         # Optional second Remote
-REMOTE_3_IP=192.168.1.103         # Optional third Remote
-
-COUNCIL_IP=192.168.1.101          # For backward compatibility
-COUNCIL_PORT=11434                # Ollama port on Remote
-
-# Host Configuration
-CHAIRMAN_IP=ollama-chairman
-CHAIRMAN_PORT=11434
-```
-
----
-
 ## Troubleshooting
 
-### Host Can't Connect to Remote
+### Connection Error
 
 **Symptom:** `curl http://<REMOTE_IP>:11434/api/tags` fails
 
 **Solutions:**
 
 1. Verify Remote IP address:
-   ```bash
-   # On Remote
-   ipconfig  # Windows
-   ip addr   # Linux/Mac
-   ```
-
-2. Check Ollama is running on Remote:
+2. Check Ollama is running on Remote / Host :
    ```bash
    docker ps | grep ollama
    ```
-
-3. Test port 11434 is open:
-   ```powershell
-   # On Host
-   Test-NetConnection -ComputerName <REMOTE_IP> -Port 11434
-   ```
-
-4. Add firewall rule (see Installation Step 3)
-
+3. Test port 11434 is open
+4. Check firewall rule
 5. Ensure Host and Remote are on same network subnet
 
-### "Model Not Found" Error
+### Model Not Found
 
-**Solution:** Pull the missing model on the appropriate machine:
-
-```bash
-# On Remote (for councilor models)
-docker exec llm-council-ollama-council ollama pull llama3.2:1b
-docker exec llm-council-ollama-council ollama pull gemma2:2b
-docker exec llm-council-ollama-council ollama pull phi3:3.8b
-
-# On Host (for chairman model - required)
-docker exec llm-council-ollama-chairman ollama pull qwen2.5:1.5b
-
-# On Host (for councilors if running some on Host)
-docker exec llm-council-ollama-chairman ollama pull llama3.2:1b
-```
+**Solutions:**
+1. Check yout internet connection
+2. Pull the missing model on the appropriate machine:
+   ```bash
+   docker exec llm-council-ollama-council ollama pull <model name>
+   ```
 
 ### Services Won't Start
 
@@ -723,7 +365,6 @@ docker exec llm-council-ollama-chairman ollama pull llama3.2:1b
    ```bash
    docker ps
    ```
-
 2. View logs:
    ```bash
    # On Host
@@ -732,11 +373,7 @@ docker exec llm-council-ollama-chairman ollama pull llama3.2:1b
    # On Remote
    docker compose -f docker-compose-pipeline.yaml logs
    ```
-
-3. Restart Docker Desktop (Windows/Mac) or:
-   ```bash
-   sudo systemctl restart docker  # Linux
-   ```
+3. Restart Docker Desktop 
 
 ### Frontend Shows "Failed to Load Conversations"
 
@@ -744,7 +381,7 @@ docker exec llm-council-ollama-chairman ollama pull llama3.2:1b
 
 1. Check backend is running on Host:
    ```bash
-   curl http://localhost:8000/
+   curl http://localhost:8001/
    ```
 
 2. Restart backend:
@@ -759,82 +396,13 @@ docker exec llm-council-ollama-chairman ollama pull llama3.2:1b
 1. Increase Docker memory limit:
    - Docker Desktop → Settings → Resources → Memory
    - Set to at least 8GB on Host, 12GB on Remote
+   - OR : Prune docker volumes
 
 2. Use smaller models (edit `backend/config.py`)
 
 3. Reduce number of councilor models
 
 4. Distribute councilors across more Remote machines
-
----
-
-## Useful Commands
-
-### Docker Management
-
-```bash
-# Start Host services
-docker-compose -f docker-compose-ollama.yaml up -d
-
-# Start Remote services
-docker-compose -f docker-compose-pipeline.yaml up -d
-
-# Stop Host services
-docker-compose -f docker-compose-ollama.yaml down
-
-# Stop Remote services
-docker-compose -f docker-compose-pipeline.yaml down
-
-# View logs on Host
-docker compose logs -f backend
-docker compose logs -f ollama-chairman
-
-# View logs on Remote
-docker compose logs -f ollama-council
-
-# Restart specific service
-docker compose restart backend
-```
-
-### Ollama Commands
-
-```bash
-# List models on Remote
-docker exec llm-council-ollama-council ollama list
-
-# List models on Host
-docker exec llm-council-ollama-chairman ollama list
-
-# Pull new model on Remote
-docker exec llm-council-ollama-council ollama pull <model-name>
-
-# Pull new model on Host
-docker exec llm-council-ollama-chairman ollama pull <model-name>
-
-# Remove model
-docker exec llm-council-ollama-council ollama rm <model-name>
-
-# Check API status on Remote
-curl http://<REMOTE_IP>:11434/api/tags
-
-# Check API status on Host
-curl http://localhost:11434/api/tags
-```
-
-### Backend API Testing
-
-```bash
-# Health check
-curl http://localhost:8000/
-
-# List conversations
-curl http://localhost:8000/api/conversations
-
-# Get conversation details
-curl http://localhost:8000/api/conversations/<conversation-id>
-```
-
----
 
 ## Generative AI Usage Statement
 
@@ -851,38 +419,6 @@ This project utilized the following AI tools during development:
   - Boilerplate generation
 
 All AI-generated content was reviewed, tested, and modified by the development team. 
-
----
-
-## Acknowledgments
-
-**Inspired by:**
-- Andrej Karpathy's LLM Council concept
-- Multi-agent AI research (DeepMind, OpenAI, Anthropic)
-
-**Built with:**
-- [Ollama](https://ollama.ai/) - Local LLM infrastructure
-- [FastAPI](https://fastapi.tiangolo.com/) - Modern Python web framework
-- [React](https://react.dev/) - Frontend UI library
-- [Docker](https://www.docker.com/) - Containerization platform
-
----
-
-## License
-
-[Add license information as specified by your institution]
-
----
-
-**For detailed technical information**, see [TECHNICAL_REPORT.md](TECHNICAL_REPORT.md)
-
-**Quick Links**:
-- [Architecture Overview](#architecture-overview)
-- [Setup Instructions](#setup-and-installation-instructions)
-- [Demo Instructions](#instructions-to-run-the-demo)
-- [Configuration](#configuration)
-- [Troubleshooting](#troubleshooting)
-- [Technical Report](TECHNICAL_REPORT.md)
 
 
 _Written with the assistance of AI tools._
