@@ -1,4 +1,4 @@
-# 🧠 LLM Council - Distributed Multi-Model AI System
+# LLM Council - Distributed Multi-Model AI System
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green.svg)](https://fastapi.tiangolo.com/)
@@ -8,7 +8,7 @@
 
 ---
 
-## 👥 Team Information
+## Team Information
 
 **Institution**: De Vinci Higher Education - Gen AI Course  
 **TD Group**: CDOF2 
@@ -21,25 +21,25 @@
  
 ---
 
-## 📋 Project Overview
+## Project Overview
 
 The **LLM Council** is a fully local, distributed multi-agent AI system that replaces single-model inference with collaborative decision-making. Instead of querying one AI model, the system orchestrates multiple locally-running models through a **three-stage deliberation process** to provide comprehensive, bias-reduced responses.
 
 ### Primary Use Cases
 
-1. **🎯 Cognitive Bias Detection**: Analyze text for logical fallacies and reasoning errors
-2. **🔬 Bias Analysis Research**: Study how multi-model collaboration reduces individual AI biases through peer review and consensus building
+1. **Cognitive Bias Detection**: Analyze text for logical fallacies and reasoning errors
+2. **Bias Analysis Research**: Study how multi-model collaboration reduces individual AI biases through peer review and consensus building
 
 ### Key Features
 
-- 🏠 **Fully Local Execution** - No cloud APIs, all models run on your infrastructure
-- 🌐 **Distributed Architecture** - Designed to run across multiple machines via REST APIs
-- 🐳 **Containerized Deployment** - Docker Compose orchestration for easy setup
-- 🦙 **Ollama Integration** - Leverages Ollama for efficient local LLM hosting
-- ⚛️ **Modern Web UI** - React-based interface with conversation management
-- 🔄 **Async Processing** - FastAPI backend with concurrent model querying
-- 💾 **Conversation Storage** - Persistent JSON-based conversation history
-- 🎨 **3-Pane Interface** - View all model responses, reviews, and final synthesis
+- **Fully Local Execution** - No cloud APIs, all models run on your infrastructure
+- **Distributed Architecture** - Designed to run across multiple machines via REST APIs
+- **Containerized Deployment** - Docker Compose orchestration for easy setup
+- **Ollama Integration** - Leverages Ollama for efficient local LLM hosting
+- **Modern Web UI** - React-based interface with conversation management
+- **Async Processing** - FastAPI backend with concurrent model querying
+- **Conversation Storage** - Persistent JSON-based conversation history
+- **3-Pane Interface** - View all model responses, reviews, and final synthesis
 
 ### Three-Stage Deliberation Process
 
@@ -75,7 +75,7 @@ The **LLM Council** is a fully local, distributed multi-agent AI system that rep
 
 ---
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 ### Host and Remote Configuration
 
@@ -146,17 +146,17 @@ Total: 1 Chairman + 4 Councilors distributed across 3 machines
 
 ---
 
-## 🚀 Setup and Installation Instructions
+## Setup and Installation Instructions
 
 ### Prerequisites
 
-- ✅ **1 Host machine** (required)
-- ✅ **0-N Remote machines** (optional, for distributed setup)
-- ✅ **Docker & Docker Compose** installed on all machines
-- ✅ **8GB+ RAM** on Host (for Chairman + Backend + Frontend)
-- ✅ **4GB+ RAM per councilor model** on Remote machines
-- ✅ **20GB free disk space** for models and data
-- ✅ **Local network connectivity** between machines (if using Remote)
+- **1 Host machine** (required)
+- **0-N Remote machines** (optional, for distributed setup)
+- **Docker & Docker Compose** installed on all machines
+- **8GB+ RAM** on Host (for Chairman + Backend + Frontend)
+- **4GB+ RAM per councilor model** on Remote machines
+- **20GB free disk space** for models and data
+- **Local network connectivity** between machines (if using Remote)
 
 **System Requirements:**
 
@@ -227,7 +227,7 @@ docker exec llm-council-ollama-council ollama pull phi3:3.8b
 docker exec llm-council-ollama-council ollama pull llama3.2:1b
 ```
 
-⏰ **This takes 5-10 minutes** depending on your internet speed. 
+**This takes 5-10 minutes** depending on your internet speed. 
 
 **Verify Remote is ready:**
 
@@ -235,7 +235,7 @@ docker exec llm-council-ollama-council ollama pull llama3.2:1b
 docker exec llm-council-ollama-council ollama list
 ```
 
-You should see the models you pulled.  ✅
+You should see the models you pulled.  
 
 **Configure Firewall:**
 
@@ -291,7 +291,7 @@ Pull the chairman model:
 docker exec llm-council-ollama-chairman ollama pull qwen2.5:1. 5b
 ```
 
-⏰ **Takes 2-3 minutes**
+**Takes 2-3 minutes**
 
 **Optional: Pull councilor models on Host** (if you want some councilors on Host):
 
@@ -312,8 +312,8 @@ From **Host machine**, verify it can reach each Remote's Ollama:
 curl http://192.168.1.101:11434/api/tags
 ```
 
-✅ **Success**:  You should see JSON output listing Remote's models  
-❌ **Failure**: Check firewall rules and network connectivity
+**Success**:  You should see JSON output listing Remote's models  
+**Failure**: Check firewall rules and network connectivity
 
 #### Step 6: Verify Installation
 
@@ -327,7 +327,7 @@ You should see the LLM Council web interface!  🎉
 
 ---
 
-## 🎬 Instructions to Run the Demo
+## Instructions to Run the Demo
 
 ### Access the Application
 
@@ -450,14 +450,14 @@ You're either with us or against us - there's no middle ground on this issue.
 
 During the live demo, you should showcase: 
 
-✅ **Distributed Architecture**: 
+**Distributed Architecture**: 
    - If using Remote:  Show councilor models on Remote, chairman on Host
    - If single machine:  Explain how it can scale to multiple machines
 
-✅ **Council Responses**:  All 3 stages visible in the interface  
-✅ **Review Stage**: Models evaluating each other's responses  
-✅ **Chairman Final Answer**: Synthesized, comprehensive response (always from Host)  
-✅ **Bias Detection**: Clear identification of cognitive biases in test statements
+**Council Responses**:  All 3 stages visible in the interface  
+**Review Stage**: Models evaluating each other's responses  
+**Chairman Final Answer**: Synthesized, comprehensive response (always from Host)  
+**Bias Detection**: Clear identification of cognitive biases in test statements
 
 ### Demo Troubleshooting
 
@@ -478,7 +478,7 @@ During the live demo, you should showcase:
 
 ---
 
-## 🛠️ Configuration
+## Configuration
 
 ### Project Structure
 
@@ -668,7 +668,7 @@ CHAIRMAN_PORT=11434
 
 ---
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Host Can't Connect to Remote
 
@@ -768,7 +768,7 @@ docker exec llm-council-ollama-chairman ollama pull llama3.2:1b
 
 ---
 
-## 📚 Useful Commands
+## Useful Commands
 
 ### Docker Management
 
@@ -836,7 +836,7 @@ curl http://localhost:8000/api/conversations/<conversation-id>
 
 ---
 
-## 🤖 Generative AI Usage Statement
+## Generative AI Usage Statement
 
 This project utilized the following AI tools during development:
 
@@ -854,7 +854,7 @@ All AI-generated content was reviewed, tested, and modified by the development t
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 **Inspired by:**
 - Andrej Karpathy's LLM Council concept
@@ -868,7 +868,7 @@ All AI-generated content was reviewed, tested, and modified by the development t
 
 ---
 
-## 📄 License
+## License
 
 [Add license information as specified by your institution]
 
