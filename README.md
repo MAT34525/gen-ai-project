@@ -7,6 +7,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Compose-blue.svg)](https://www.docker.com/)
 [![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-orange.svg)](https://ollama.ai/)
 
+> [!NOTE] 
 > **For detailed technical information**, see [TECHNICAL_REPORT.md](TECHNICAL_REPORT.md)
 
 ## Acknowledgments
@@ -409,16 +410,15 @@ The UI will display three tabs:
 This project utilized the following AI tools during development:
 
 - **Claude Sonnet 4. 5** (via GitHub Copilot)
-  - Code refactoring and optimization
-  - Documentation generation
-  - Architecture design suggestions
+  - Code refactoring and optimization | **models.py, council.py & config.py done by human**
+  - Documentation generation | **reviewed, simplified and corrected by human**
+  - Architecture design suggestions | **dockerfiles & docker-compose done by human**
   - Debugging assistance
 
 - **GitHub Copilot**
-  - Code completion
+  - Code completion (function descriptors and comments)
   - Boilerplate generation
 
 All AI-generated content was reviewed, tested, and modified by the development team. 
-
 
 _Written with the assistance of AI tools._
