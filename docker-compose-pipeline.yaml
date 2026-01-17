@@ -5,6 +5,8 @@ services:
     build: backend
     ports: 
       - 8001:8001
+    volumes:
+      - conv_history:/usr/src/app/data/conversations
     networks:
       - council-network
 
@@ -37,6 +39,8 @@ services:
 volumes:
   ollama_data:
     name: ollama_data
+  conv_history:
+    name: conv_history
 
 networks:
   council-network:

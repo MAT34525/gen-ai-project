@@ -13,7 +13,7 @@ export default function Sidebar({
     <div className="sidebar">
       <div className="sidebar-header">
         <div className="sidebar-title-row">
-          <h1>Biais Detector Council</h1>
+          <h1>LLM Council</h1>
           <button
             type="button"
             className="theme-toggle"
