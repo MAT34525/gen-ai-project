@@ -10,13 +10,7 @@ WORKDIR /usr/src/app
 COPY . .
 
 # Install any needed packages specified in requirements.txt 
-RUN pip install fastapi>=0.115.0
-RUN pip install uvicorn>=0.32.0
-RUN pip install python-dotenv>=1.0.0
-RUN pip install httpx>=0.27.0
-RUN pip install pydantic>=2.9.0
-RUN pip install requests
-
+RUN pip install -r requirements.txt --no-cache-dir
 # Make port 80 available to the world outside this container (Optional, only for web apps)
 EXPOSE 8001
 

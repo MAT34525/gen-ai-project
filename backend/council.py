@@ -19,7 +19,7 @@ class Council() :
         messages = [
             {
                 "role": "user", 
-                "content": f"'{user_query}'"
+                "content": f"Répond à la demande : '{user_query}'. Reste synthétique, concis utilise des bullet points."
             }
         ]
 
@@ -55,7 +55,7 @@ class Council() :
 
         # Build the ranking prompt
         responses_text = "\n\n".join([
-            f"Response {label}:\n{result['response']}"
+            f"Response {label}:\n{result['response']}" if result['response'] else f"Response {label}:\n Aucune réponse reçue, ne considère pas ce résultat."
             for label, result in zip(labels, stage1_results)
         ])
 
@@ -126,7 +126,7 @@ class Council() :
             for result in stage2_results
         ])
 
-        chairman_prompt = f"""Vous êtes le président d'un conseil de master en droit. Plusieurs modèles d'IA ont analyser les biais cognitifs dans une phrase, puis ont classé leurs réponses respectives.
+        chairman_prompt = f"""Vous êtes le président d'un conseil de master en droit. Plusieurs modèles d'IA répondent à la question, puis ont classé leurs réponses respectives.
 
     Phrase à analyser : {user_query}
 
@@ -143,6 +143,8 @@ class Council() :
     - Les éventuels points de convergence ou de divergence
     
     Fournir une réponse finale claire et bien argumentée qui représente la sagesse collective du conseil :"""
+        
+        print(chairman_prompt)
 
         messages = [{"role": "user", "content": chairman_prompt}]
 
