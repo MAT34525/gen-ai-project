@@ -67,11 +67,11 @@ The **LLM Council** is a fully local, distributed multi-agent AI system that rep
 
 **Why This Approach?**
 
-✅ **Diverse Perspectives**: 3 different models with varying architectures and training  
-✅ **Bias Reduction**: Peer review process reduces individual model biases  
-✅ **Comprehensive Answers**:  Synthesis combines strengths of all models  
-✅ **Full Privacy**: All processing happens locally, no cloud APIs  
-✅ **Research Platform**: Study how multi-agent collaboration affects AI bias
+- **Diverse Perspectives**: 3 different models with varying architectures and training  
+- **Bias Reduction**: Peer review process reduces individual model biases  
+- **Comprehensive Answers**:  Synthesis combines strengths of all models  
+- **Full Privacy**: All processing happens locally, no cloud APIs  
+- **Research Platform**: Study how multi-agent collaboration affects AI bias
 
 ---
 
