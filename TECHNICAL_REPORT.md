@@ -602,3 +602,6 @@ The LLM Council project successfully demonstrates:
 **Last Updated**: 2026-01-15  
 **Team**: Mathys D., Mathéo D., Edouard D. 
 **TD Group**: CDOF2
+
+
+_Written with the assistance of AI tools._

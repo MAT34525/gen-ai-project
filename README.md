@@ -485,41 +485,47 @@ During the live demo, you should showcase:
 ```
 gen-ai-project/
 ├── backend/                      # FastAPI backend
-│   ├── main.py                  # API server & endpoints
-│   ├── council.py               # 3-stage orchestration logic
+│   ├── __init__.py              # Package initializer
 │   ├── config.py                # Model configuration
+│   ├── council.py               # 3-stage orchestration logic
+│   ├── dockerfile               # Backend container
+│   ├── main.py                  # API server & endpoints
 │   ├── models.py                # Data models (Pydantic)
-│   ├── openrouter.py            # Ollama API client
-│   ├── storage.py               # Conversation persistence
+│   ├── ollama.py                # Ollama API client
 │   ├── requirements.txt         # Python dependencies
-│   └── dockerfile               # Backend container
+│   └── storage.py               # Conversation persistence 
 │
 ├── frontend/                    # React UI
 │   ├── src/
-│   │   ├── App.jsx              # Main application
 │   │   ├── api.js               # Backend API client
+│   │   ├── App.css              # Application styles
+│   │   ├── App.jsx              # Main application
+│   │   ├── index.css            # Global styles
+│   │   ├── main.jsx             # React entry point
+│   │   ├── assets/              # Static assets (images, icons)
 │   │   └── components/
-│   │       ├── ChatInterface.jsx  # Chat UI orchestrator
-│   │       ├── Sidebar.jsx        # Conversation list
-│   │       ├── Stage1.jsx         # Display initial responses
-│   │       ├── Stage2.jsx         # Show peer reviews
-│   │       └── Stage3.jsx         # Present synthesis
+│   │       ├── ChatInterface.css    # Chat UI styles
+│   │       ├── ChatInterface.jsx    # Chat UI orchestrator
+│   │       ├── Sidebar.css          # Sidebar styles
+│   │       ├── Sidebar.jsx          # Conversation list
+│   │       ├── Stage1.css           # Stage 1 styles
+│   │       ├── Stage1.jsx           # Display initial responses
+│   │       ├── Stage2.css           # Stage 2 styles
+│   │       ├── Stage2.jsx           # Show peer reviews
+│   │       ├── Stage3.css           # Stage 3 styles
+│   │       └── Stage3.jsx           # Present synthesis
+│   ├── dockerfile               # Frontend container
+│   ├── eslint.config.js         # ESLint configuration
+│   ├── index.html               # HTML entry point
 │   ├── package.json             # Node dependencies
-│   ├── vite.config.js           # Vite build config
-│   └── dockerfile               # Frontend container
-│
-├── data/
-│   └── conversations/           # JSON conversation storage
+│   ├── README.md                # Frontend documentation
+│   └── vite.config.js           # Vite build config
 │
 ├── docker-compose-ollama.yaml   # Host services (Chairman + Backend + UI)
 ├── docker-compose-pipeline.yaml # Remote services (Councilor models)
-├── docker-compose.pc1.yaml      # Alternative: PC1 setup
-├── docker-compose.pc2.yaml      # Alternative: PC2 setup
-├── docker-compose.full.yaml     # Alternative: Single machine setup
-│
+├── main.py                      # Root Python script
 ├── README.md                    # This file
-├── TECHNICAL_REPORT.md          # Technical documentation
-└── .gitignore
+└── TECHNICAL_REPORT.md          # Technical documentation
 ```
 
 ### Customizing Model Distribution (Host vs.  Remote)
@@ -879,4 +885,4 @@ All AI-generated content was reviewed, tested, and modified by the development t
 - [Technical Report](TECHNICAL_REPORT.md)
 
 
-__Written with the assistance of AI tools.__
+_Written with the assistance of AI tools._
